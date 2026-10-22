@@ -90,7 +90,11 @@ const RefurbishedFilters = ({
       <div className="mb-6">
         <h3 className="text-2xl font-extrabold text-[#FF6534] mb-3">Condition</h3>
         <div className="space-y-2.5">
+<<<<<<< HEAD
           {['Fair', 'Fair+', 'Good', 'Excellent'].map((cond) => (
+=======
+          {['Refurbished', 'New'].map((cond) => (
+>>>>>>> 8f997a0 (Fix frontend tracking)
             <label
               key={cond}
               className="flex items-center space-x-3 text-sm font-semibold text-gray-700 cursor-pointer select-none hover:text-[#FF6534] transition-colors"

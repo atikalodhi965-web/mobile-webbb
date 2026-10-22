@@ -33,6 +33,7 @@ const AdminLivePage = ({
   formFields = [],
   buildPayload,
   bulkLink,          // optional; "Add more in bulk" always shows, href defaults to "#"
+  renderCustomForm,
 }) => {
   const { items, loading, saving, error, fetchAll, create, update, remove } = resource;
 
@@ -162,6 +163,20 @@ const AdminLivePage = ({
 
       {/* ─────────────── Inline Add / Edit Form ─────────────── */}
       {showForm && (
+        renderCustomForm ? (
+          renderCustomForm({
+            isOpen: showForm,
+            isEdit: !!editRow,
+            editRow,
+            closeForm,
+            resource,
+            saving,
+            formError,
+            setFormError,
+            actionLabel,
+            title,
+          })
+        ) : (
         <div className="mb-6 bg-white border border-[#b8370e]/20 rounded-2xl shadow-sm overflow-hidden">
 
           {/* Form header */}
@@ -408,6 +423,7 @@ const AdminLivePage = ({
 
           </form>
         </div>
+        )
       )}
 
       {/* ─────────────── Search ─────────────── */}

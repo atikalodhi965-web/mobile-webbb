@@ -11,7 +11,11 @@ const RepairsMegaMenu = ({ onMouseEnter, onMouseLeave }) => {
     >
       {/* Container with rounded corners and shadow */}
       <div className="repairs-megamenu-container overflow-hidden bg-white">
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 8f997a0 (Fix frontend tracking)
         {/* Top Accent Bar in #FF6534 */}
         <div className="h-[3px] bg-[#FF6534] w-full"></div>
 
@@ -35,7 +39,11 @@ const RepairsMegaMenu = ({ onMouseEnter, onMouseLeave }) => {
 
               {/* 3 Sub-Columns: iPhone (2 sub-cols), Samsung (1 sub-col), Google (1 sub-col) */}
               <div className="grid grid-cols-12 gap-4 pt-1">
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> 8f997a0 (Fix frontend tracking)
                 {/* iPhone Sub-column (Span 6 out of 12 sub-cols) */}
                 <div className="col-span-6">
                   <h4 className="repairs-megamenu-sub-header mb-3">

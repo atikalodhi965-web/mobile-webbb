@@ -31,8 +31,20 @@ router.delete('/faqs/:id', faqAdmin.remove);
 
 // Hero slides
 router.get('/hero-slides', heroSlideAdmin.getAll);
-router.post('/hero-slides', setUploadFolder('cms'), upload.single('image'), heroSlideAdmin.create);
-router.put('/hero-slides/:id', setUploadFolder('cms'), upload.single('image'), heroSlideAdmin.update);
+router.post(
+  '/hero-slides',
+  setUploadFolder('cms'),
+  upload.single('image'),
+  parseJsonFields(['sortOrder']),
+  heroSlideAdmin.create
+);
+router.put(
+  '/hero-slides/:id',
+  setUploadFolder('cms'),
+  upload.single('image'),
+  parseJsonFields(['sortOrder']),
+  heroSlideAdmin.update
+);
 router.delete('/hero-slides/:id', heroSlideAdmin.remove);
 
 // Single store (edit the service centre — no multi-location CRUD)

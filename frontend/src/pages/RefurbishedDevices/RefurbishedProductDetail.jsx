@@ -87,11 +87,18 @@ const RefurbishedProductDetail = () => {
   // States for options
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [selectedCapacity, setSelectedCapacity] = useState(product.capacities[0] || '128GB');
+<<<<<<< HEAD
   const [selectedConditionIndex, setSelectedConditionIndex] = useState(
     product.conditionPrices.findIndex(c => c.condition === 'Fair+') !== -1
       ? product.conditionPrices.findIndex(c => c.condition === 'Fair+')
       : 0
   );
+=======
+  const [selectedConditionIndex, setSelectedConditionIndex] = useState(() => {
+    const idx = (product?.conditionPrices || []).findIndex(c => c.condition === 'Refurbished');
+    return idx !== -1 ? idx : 0;
+  });
+>>>>>>> 8f997a0 (Fix frontend tracking)
 
   // Accordion toggle state
   const [expandedSections, setExpandedSections] = useState({

@@ -89,31 +89,87 @@ const protectionAdmin = createCrudController(ProtectionPlan, {
 });
 
 const getAllPages = asyncHandler(async (req, res) => {
-  const pages = await PageContent.find().sort({ pageKey: 1 });
-  sendSuccess(res, { message: 'CMS pages fetched', data: pages });
+  const { search } = req.query;
+  const query = {};
+  if (search) {
+    query.$or = [
+      { pageKey: { $regex: search, $options: 'i' } },
+      { pageTitle: { $regex: search, $options: 'i' } },
+    ];
+  }
+  const pages = await PageContent.find(query).sort({ pageKey: 1 });
+  sendSuccess(res, {
+    message: 'CMS pages fetched',
+    data: {
+      items: pages,
+      pagination: { total: pages.length, page: 1, limit: 100, pages: 1 },
+    },
+  });
 });
 
 const getPageByKey = asyncHandler(async (req, res) => {
-  const page = await PageContent.findOne({ pageKey: req.params.pageKey });
+  const mongoose = require('mongoose');
+  const param = req.params.pageKey;
+  let page = null;
+  if (mongoose.Types.ObjectId.isValid(param)) {
+    page = await PageContent.findOne({ $or: [{ _id: param }, { pageKey: param.toLowerCase() }] });
+  } else {
+    page = await PageContent.findOne({ pageKey: param.toLowerCase() });
+  }
   if (!page) throw new ApiError(404, 'Page content not found');
   sendSuccess(res, { message: 'Page content fetched', data: page });
 });
 
 const upsertPage = asyncHandler(async (req, res) => {
-  const pageKey = (req.body.pageKey || req.params.pageKey || '').toLowerCase();
+  const mongoose = require('mongoose');
+  const param = req.params.pageKey;
+  let pageKey = (req.body.pageKey || '').toLowerCase().trim();
+
+  if (!pageKey && param) {
+    if (mongoose.Types.ObjectId.isValid(param)) {
+      const existing = await PageContent.findById(param);
+      if (existing) pageKey = existing.pageKey;
+    } else {
+      pageKey = param.toLowerCase().trim();
+    }
+  }
+
   if (!pageKey) throw new ApiError(400, 'pageKey is required');
 
   const payload = {
     ...req.body,
     pageKey,
-    updatedBy: req.user._id,
+    updatedBy: req.user?._id || null,
   };
+
+  if (typeof payload.sections === 'string') {
+    try {
+      payload.sections = JSON.parse(payload.sections);
+    } catch {
+      payload.sections = payload.sections ? [{ sectionKey: 'main', body: payload.sections }] : [];
+    }
+  }
+
+  if (typeof payload.seo === 'string') {
+    try {
+      payload.seo = JSON.parse(payload.seo);
+    } catch {
+      payload.seo = {};
+    }
+  }
+
+  if (payload.isPublished !== undefined) {
+    payload.isPublished = payload.isPublished === true || payload.isPublished === 'true';
+  }
 
   if (req.file) {
     const imagePath = `/uploads/${req.uploadFolder || 'cms'}/${req.file.filename}`;
-    if (!payload.sections) payload.sections = [];
-    // attach image to first section if provided as single upload
-    if (payload.sections[0]) payload.sections[0].image = imagePath;
+    if (!payload.sections || !Array.isArray(payload.sections)) payload.sections = [];
+    if (!payload.sections[0]) {
+      payload.sections[0] = { sectionKey: 'hero', image: imagePath };
+    } else {
+      payload.sections[0].image = imagePath;
+    }
   }
 
   const page = await PageContent.findOneAndUpdate(
@@ -126,7 +182,14 @@ const upsertPage = asyncHandler(async (req, res) => {
 });
 
 const deletePage = asyncHandler(async (req, res) => {
-  const page = await PageContent.findOneAndDelete({ pageKey: req.params.pageKey });
+  const mongoose = require('mongoose');
+  const param = req.params.pageKey;
+  let page;
+  if (mongoose.Types.ObjectId.isValid(param)) {
+    page = await PageContent.findOneAndDelete({ $or: [{ _id: param }, { pageKey: param.toLowerCase() }] });
+  } else {
+    page = await PageContent.findOneAndDelete({ pageKey: param.toLowerCase() });
+  }
   if (!page) throw new ApiError(404, 'Page content not found');
   sendSuccess(res, { message: 'Page content deleted', data: page });
 });

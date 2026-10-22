@@ -57,8 +57,22 @@ const getModels = asyncHandler(async (req, res) => {
   }
 
   if (req.query.deviceType) {
-    const dt = await DeviceType.findOne({ slug: req.query.deviceType, isActive: true });
-    if (dt) query.deviceTypeId = dt._id;
+    const rawDeviceType = String(req.query.deviceType).trim();
+    if (rawDeviceType) {
+      const candidates = [
+        rawDeviceType,
+        rawDeviceType.replace(/s$/i, ''),
+        `${rawDeviceType.replace(/s$/i, '')}s`,
+        rawDeviceType.endsWith('phones') ? rawDeviceType.replace(/phones$/i, 'phone') : rawDeviceType,
+      ];
+
+      const dt = await DeviceType.findOne({
+        slug: { $in: [...new Set(candidates.filter(Boolean))] },
+        isActive: true,
+      });
+
+      if (dt) query.deviceTypeId = dt._id;
+    }
   }
 
   const items = await DeviceModel.find(query)
