@@ -1,0 +1,45 @@
+/* Repairs MegaMenu CSS styling */
+
+.repairs-megamenu-container {
+  background-color: #ffffff;
+  border-radius: 1.25rem; /* 20px rounded corners - no sharp edges */
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(229, 231, 235, 0.85);
+  animation: megaMenuFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes megaMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.repairs-megamenu-link {
+  color: #282338;
+  font-size: 0.8125rem; /* ~13px matching image */
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: nowrap;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.repairs-megamenu-link:hover {
+  color: #FF6534;
+}
+
+.repairs-megamenu-header-title {
+  color: #FF6534;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.repairs-megamenu-sub-header {
+  color: #FF6534;
+  font-weight: 700;
+  font-size: 0.875rem;
+}

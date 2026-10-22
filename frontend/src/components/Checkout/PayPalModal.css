@@ -1,0 +1,176 @@
+/* PayPal Modal Styles reproducing Google Chrome PayPal Checkout popup */
+
+.paypal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: paypalFadeIn 0.2s ease-out forwards;
+}
+
+@keyframes paypalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.paypal-window {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: paypalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes paypalSlideUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Chrome Titlebar */
+.paypal-titlebar {
+  background-color: #f1f3f4;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Chrome URL Bar */
+.paypal-urlbar {
+  background-color: #ffffff;
+  padding: 0.35rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Main Body */
+.paypal-body {
+  padding: 1.75rem 2.25rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Inputs */
+.paypal-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  color: #1e293b;
+  border: 1.5px solid #0070BA;
+  border-radius: 6px;
+  outline: none;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.paypal-input:focus {
+  border-color: #003087;
+  box-shadow: 0 0 0 3px rgba(0, 112, 186, 0.2);
+}
+
+/* Links */
+.paypal-link {
+  color: #0070BA;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.paypal-link:hover {
+  text-decoration: underline;
+  color: #003087;
+}
+
+/* Buttons */
+.paypal-btn-primary {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  background-color: #0070BA;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.paypal-btn-primary:hover {
+  background-color: #003087;
+}
+
+.paypal-btn-secondary {
+  width: 100%;
+  padding: 0.8rem 1.25rem;
+  background-color: #ffffff;
+  color: #2c2e2f;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: 1.5px solid #2c2e2f;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.paypal-btn-secondary:hover {
+  background-color: #f8fafc;
+}
+
+/* Divider */
+.paypal-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.25rem 0;
+  color: #94a3b8;
+  font-size: 0.825rem;
+}
+
+.paypal-divider::before,
+.paypal-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.paypal-divider span {
+  padding: 0 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Footer */
+.paypal-footer {
+  background-color: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  padding: 1rem 1.5rem 1.25rem;
+  text-align: center;
+}

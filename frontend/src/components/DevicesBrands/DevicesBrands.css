@@ -1,0 +1,9 @@
+/* Custom styles for Devices and Brands component */
+
+.device-card-shadow {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+}
+
+.device-card-shadow:hover {
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+}

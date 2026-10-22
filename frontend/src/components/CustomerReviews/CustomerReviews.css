@@ -1,0 +1,9 @@
+/* Custom animations and styling for CustomerReviews section */
+
+.customer-reviews-shadow {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.customer-reviews-badge-shadow {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}

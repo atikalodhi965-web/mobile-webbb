@@ -1,0 +1,115 @@
+export const macbookCategories = [
+  {
+    categoryTitle: 'Apple MacBook',
+    models: [
+      {
+        id: 'macbook-retina-12-2015',
+        title: 'MacBook Retina 12"',
+        modelNumber: 'A1534',
+        year: '(Early 2015)',
+        type: 'macbook',
+      },
+      {
+        id: 'macbook-retina-12-2016',
+        title: 'MacBook Retina 12"',
+        modelNumber: 'A1534',
+        year: '(Early 2016/Mid 2017)',
+        type: 'macbook',
+      },
+    ],
+  },
+  {
+    categoryTitle: 'MacBook Pro',
+    models: [
+      {
+        id: 'macbook-pro-15-2012',
+        title: 'MacBook Pro Retina 15"',
+        modelNumber: 'A1398',
+        year: '(Mid 2012/Early 2013)',
+        type: 'pro',
+      },
+      {
+        id: 'macbook-pro-15-2013',
+        title: 'MacBook Pro Retina 15"',
+        modelNumber: 'A1398',
+        year: '(Late 2013/Mid 2014)',
+        type: 'pro',
+      },
+      {
+        id: 'macbook-pro-13-2015',
+        title: 'MacBook Pro Retina 13"',
+        modelNumber: 'A1502',
+        year: '(Early 2015)',
+        type: 'pro',
+      },
+      {
+        id: 'macbook-pro-13-2016',
+        title: 'MacBook Pro Retina 13"',
+        modelNumber: 'A1708',
+        year: '(Late 2016/Mid 2017)',
+        type: 'pro',
+      },
+      {
+        id: 'macbook-pro-15-2015',
+        title: 'MacBook Pro Retina 15"',
+        modelNumber: 'A1398',
+        year: '(Mid 2015)',
+        type: 'pro',
+      },
+      {
+        id: 'macbook-pro-15-touchbar',
+        title: 'MacBook Pro 15" with Touch Bar',
+        modelNumber: 'A1990',
+        year: '(Late 2018/Early 2019)',
+        type: 'pro',
+      },
+      {
+        id: 'macbook-pro-13-2018',
+        title: 'MacBook Pro 13"',
+        modelNumber: 'A1989',
+        year: '(Late 2018/Early 2019)',
+        type: 'pro',
+      },
+      {
+        id: 'macbook-pro-13-2020',
+        title: 'MacBook Pro 13"',
+        modelNumber: 'A2251',
+        year: '(Mid 2020)',
+        type: 'pro',
+      },
+    ],
+  },
+  {
+    categoryTitle: 'MacBook Air',
+    models: [
+      {
+        id: 'macbook-air-11-2011',
+        title: 'MacBook Air 11"',
+        modelNumber: 'A1370',
+        year: '(Mid 2011)',
+        type: 'air',
+      },
+      {
+        id: 'macbook-air-11-2012',
+        title: 'MacBook Air 11"',
+        modelNumber: 'A1465',
+        year: '(Mid 2012)',
+        type: 'air',
+      },
+      {
+        id: 'macbook-air-13-2013',
+        title: 'MacBook Air 13"',
+        modelNumber: 'A1466',
+        year: '(Mid 2013)',
+        type: 'air',
+      },
+      {
+        id: 'macbook-air-13-2014',
+        title: 'MacBook Air 13"',
+        modelNumber: 'A1405',
+        year: '(Mid 2012/Early 2014/Mid 2015)',
+        type: 'air',
+      },
+    ],
+  },
+];

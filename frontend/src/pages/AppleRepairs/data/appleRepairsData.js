@@ -1,0 +1,148 @@
+import appleImg from '../../../assets/images/apple-iphone.png';
+
+export const applePhonesData = [
+  {
+    id: 'iphone-17-pro-max',
+    name: 'iPhone 17 Pro Max',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-17-pro-max',
+  },
+  {
+    id: 'iphone-17-pro',
+    name: 'iPhone 17 Pro',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-17-pro',
+  },
+  {
+    id: 'iphone-17',
+    name: 'iPhone 17',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-17',
+  },
+  {
+    id: 'iphone-air',
+    name: 'iPhone Air',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-air',
+  },
+  {
+    id: 'iphone-16-pro-max',
+    name: 'iPhone 16 Pro Max',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-16-pro-max',
+  },
+  {
+    id: 'iphone-16-pro',
+    name: 'iPhone 16 Pro',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-16-pro',
+  },
+  {
+    id: 'iphone-16-plus',
+    name: 'iPhone 16 Plus',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-16-plus',
+  },
+  {
+    id: 'iphone-16',
+    name: 'iPhone 16',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-16',
+  },
+  {
+    id: 'iphone-15-pro-max',
+    name: 'iPhone 15 Pro Max',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-15-pro-max',
+  },
+  {
+    id: 'iphone-15-pro',
+    name: 'iPhone 15 Pro',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-15-pro',
+  },
+  {
+    id: 'iphone-15-plus',
+    name: 'iPhone 15 Plus',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-15-plus',
+  },
+  {
+    id: 'iphone-15',
+    name: 'iPhone 15',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-15',
+  },
+  {
+    id: 'iphone-14-pro-max',
+    name: 'iPhone 14 Pro Max',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-14-pro-max',
+  },
+  {
+    id: 'iphone-14-pro',
+    name: 'iPhone 14 Pro',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-14-pro',
+  },
+  {
+    id: 'iphone-14-plus',
+    name: 'iPhone 14 Plus',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-14-plus',
+  },
+  {
+    id: 'iphone-14',
+    name: 'iPhone 14',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-14',
+  },
+  {
+    id: 'iphone-13-pro-max',
+    name: 'iPhone 13 Pro Max',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-13-pro-max',
+  },
+  {
+    id: 'iphone-13-pro',
+    name: 'iPhone 13 Pro',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-13-pro',
+  },
+  {
+    id: 'iphone-13',
+    name: 'iPhone 13',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-13',
+  },
+  {
+    id: 'iphone-12-pro-max',
+    name: 'iPhone 12 Pro Max',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-12-pro-max',
+  },
+  {
+    id: 'iphone-12-pro',
+    name: 'iPhone 12 Pro',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-12-pro',
+  },
+  {
+    id: 'iphone-12',
+    name: 'iPhone 12',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-12',
+  },
+  {
+    id: 'iphone-11',
+    name: 'iPhone 11',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-11',
+  },
+  {
+    id: 'iphone-se',
+    name: 'iPhone SE (2022)',
+    image: appleImg,
+    href: '/pages/repairs/apple/iphone-se',
+  },
+];

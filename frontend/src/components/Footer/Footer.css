@@ -1,0 +1,17 @@
+/* Custom CSS for Footer component */
+
+.footer-container {
+  background-color: #B8CFE2;
+}
+
+.floating-scroll-top-btn {
+  background-color: #FF6534;
+  transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floating-scroll-top-btn:hover {
+  background-color: #e55527;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 101, 52, 0.45);
+}
+

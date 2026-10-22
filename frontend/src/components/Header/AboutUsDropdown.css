@@ -1,0 +1,38 @@
+/* AboutUsDropdown CSS styling */
+
+.about-us-dropdown-container {
+  background-color: #ffffff;
+  border-radius: 1.25rem;
+  /* 20px rounded corners - no sharp edges */
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(229, 231, 235, 0.85);
+  animation: aboutUsFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes aboutUsFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-us-dropdown-link {
+  color: #282338;
+  font-size: 0.875rem;
+  /* ~14px */
+  font-weight: 700;
+  display: block;
+  padding: 0.75rem 1.25rem;
+  white-space: nowrap;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.about-us-dropdown-link:hover {
+  color: #FF6534;
+  background-color: #FFF8F6;
+}

@@ -1,0 +1,23 @@
+/* Custom styles for Why SAMZ section */
+
+.why-SAMZ-container {
+  background-color: #FFF5F2;
+}
+
+.why-SAMZ-klarna-box {
+  border-color: #E2E8F0;
+  transition: all 0.25s ease-in-out;
+}
+
+.why-SAMZ-klarna-box:hover {
+  border-color: #FF6534;
+  box-shadow: 0 4px 16px rgba(255, 101, 52, 0.12);
+}
+
+.why-SAMZ-icon-wrapper {
+  transition: transform 0.25s ease;
+}
+
+.why-SAMZ-icon-wrapper:hover {
+  transform: translateY(-3px) scale(1.05);
+}

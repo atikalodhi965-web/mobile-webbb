@@ -1,0 +1,363 @@
+/* OurWarrantyScreen.css */
+
+.warranty-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem 1.5rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: #374151;
+}
+
+/* Main Page Title */
+.warranty-title {
+  color: #FF6534;
+  font-size: 2.25rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 768px) {
+  .warranty-title {
+    font-size: 2.85rem;
+  }
+}
+
+/* Banner Section */
+.warranty-banner-wrapper {
+  width: 100%;
+  background-color: #f3f3f5;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 3.5rem;
+}
+
+.warranty-banner-content {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .warranty-banner-content {
+    flex-direction: row;
+    padding: 3rem 4rem;
+  }
+}
+
+.warranty-banner-text {
+  flex: 1;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .warranty-banner-text {
+    text-align: left;
+  }
+}
+
+.warranty-banner-text h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #111827;
+  line-height: 1.1;
+  margin-bottom: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .warranty-banner-text h2 {
+    font-size: 3.5rem;
+  }
+}
+
+.warranty-banner-text .highlight-pink {
+  color: #FF6534;
+  display: block;
+}
+
+.warranty-banner-text p {
+  font-size: 1.125rem;
+  color: #4b5563;
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
+.warranty-banner-image-container {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.warranty-banner-img {
+  max-width: 100%;
+  height: auto;
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Introductory Paragraphs */
+.warranty-intro-text {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #4b5563;
+  text-align: center;
+  max-width: 960px;
+  margin: 0 auto 3rem auto;
+}
+
+@media (min-width: 768px) {
+  .warranty-intro-text {
+    font-size: 0.9375rem;
+  }
+}
+
+/* Google Pixel Box */
+.warranty-google-box {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto 3.5rem auto;
+}
+
+.warranty-google-title {
+  color: #FF6534;
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+.warranty-google-desc {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.warranty-link {
+  color: #111827;
+  font-weight: 700;
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+
+.warranty-link:hover {
+  color: #FF6534;
+}
+
+/* Warranty Table Section */
+.warranty-table-section {
+  max-width: 900px;
+  margin: 0 auto 4rem auto;
+}
+
+.warranty-table-container {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border: 2px solid #1f2937;
+}
+
+.warranty-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.warranty-table th,
+.warranty-table td {
+  border: 1.5px solid #1f2937;
+  padding: 0.85rem 0.65rem;
+  vertical-align: middle;
+}
+
+.warranty-table th {
+  background-color: #ebf1f5;
+  color: #111827;
+  font-weight: 800;
+  font-size: 0.9375rem;
+}
+
+.warranty-table .brand-col-cell {
+  text-align: left;
+  padding-left: 1.25rem;
+  color: #FF6534;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  background-color: #ffffff;
+}
+
+.warranty-table .duration-cell {
+  font-weight: 600;
+  color: #1f2937;
+  background-color: #ffffff;
+}
+
+.warranty-table .gray-empty-cell {
+  background-color: #eaeaea;
+}
+
+.warranty-table-notes {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #6b7280;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 1.5rem auto 0 auto;
+}
+
+/* FAQ Section */
+.warranty-faq-section {
+  max-width: 800px;
+  margin: 4rem auto;
+  text-align: center;
+}
+
+.warranty-faq-item {
+  margin-bottom: 2.25rem;
+}
+
+.warranty-faq-question {
+  color: #FF6534;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.warranty-faq-answer {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+/* Book Appointment CTA Button */
+.warranty-cta-btn {
+  display: inline-block;
+  background-color: #FF6534;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  padding: 0.9rem 2.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(255, 101, 52, 0.3);
+  margin-top: 1.5rem;
+  cursor: pointer;
+  border: none;
+}
+
+.warranty-cta-btn:hover {
+  background-color: #e55527;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 101, 52, 0.4);
+}
+
+/* Form Section */
+.warranty-form-section {
+  max-width: 720px;
+  margin: 5rem auto 2rem auto;
+}
+
+.warranty-form-title {
+  color: #FF6534;
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.warranty-form-subtitle {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 2.5rem;
+}
+
+.warranty-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.warranty-form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 0.4rem;
+}
+
+.warranty-form-input,
+.warranty-form-select,
+.warranty-form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+  background-color: #ffffff;
+  color: #111827;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.warranty-form-input:focus,
+.warranty-form-select:focus,
+.warranty-form-textarea:focus {
+  border-color: #FF6534;
+  box-shadow: 0 0 0 3px rgba(255, 101, 52, 0.15);
+}
+
+.warranty-form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.warranty-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.warranty-checkbox-label {
+  font-size: 0.825rem;
+  color: #374151;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.warranty-disclaimer {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 2.5rem;
+}
+
+.warranty-submit-btn-wrapper {
+  text-align: center;
+}
+
+.warranty-submit-btn {
+  background-color: #FF6534;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.85rem 3.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(255, 101, 52, 0.3);
+}
+
+.warranty-submit-btn:hover {
+  background-color: #e55527;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 101, 52, 0.4);
+}

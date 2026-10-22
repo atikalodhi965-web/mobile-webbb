@@ -1,0 +1,124 @@
+/* AboutUsScreen.css */
+
+.about-us-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem 1.5rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: #374151;
+}
+
+/* Header Title */
+.about-us-title {
+  color: #FF6534; /* Signature orange-red brand color */
+  font-size: 2.25rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 3.5rem;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 768px) {
+  .about-us-title {
+    font-size: 2.85rem;
+  }
+}
+
+/* Two-column layout */
+.about-us-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  margin-bottom: 4rem;
+}
+
+@media (min-width: 900px) {
+  .about-us-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem;
+  }
+}
+
+.about-us-text-p {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+}
+
+.about-us-text-p strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+/* Images */
+.about-us-img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.about-us-img-container {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Feature Badges Section */
+.about-us-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  gap: 2.5rem 3.5rem;
+  margin: 4.5rem 0;
+  padding: 2.5rem 1.5rem;
+  background-color: #fafafd;
+  border-radius: 12px;
+  border: 1px solid #f0f0f5;
+}
+
+.about-us-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.about-us-feature-icon {
+  width: 72px;
+  height: 72px;
+  color: #FF6534; /* Signature orange-red brand color */
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(255, 101, 52, 0.15));
+}
+
+.about-us-feature-text {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #1a1523;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Bottom Images Section */
+.about-us-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+@media (min-width: 640px) {
+  .about-us-bottom-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.about-us-bottom-img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}

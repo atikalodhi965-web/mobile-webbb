@@ -1,0 +1,177 @@
+/* AuthModal Custom Styles */
+
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: authBackdropFade 0.22s ease-out forwards;
+}
+
+@keyframes authBackdropFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.auth-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  animation: authCardScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes authCardScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.auth-modal-scroll-area {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2rem 2.25rem 2.25rem;
+}
+
+/* Custom scrollbar for modal */
+.auth-modal-scroll-area::-webkit-scrollbar {
+  width: 5px;
+}
+.auth-modal-scroll-area::-webkit-scrollbar-thumb {
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+}
+
+/* Tab Switcher */
+.auth-tab-btn {
+  position: relative;
+  flex: 1;
+  padding: 0.65rem 1rem;
+  font-size: 0.925rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.auth-tab-btn.active {
+  background-color: #ffffff;
+  color: #1e1b2e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.auth-tab-btn:not(.active) {
+  color: #64748b;
+}
+
+.auth-tab-btn:not(.active):hover {
+  color: #1e1b2e;
+}
+
+/* Form Input Styling */
+.auth-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.6rem;
+  font-size: 0.935rem;
+  color: #1e1b2e;
+  background-color: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.18s ease;
+}
+
+.auth-input:focus {
+  background-color: #ffffff;
+  border-color: #FF6534;
+  box-shadow: 0 0 0 3px rgba(255, 101, 52, 0.15);
+}
+
+.auth-input.has-error {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.auth-input.has-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+/* Primary Button */
+.auth-btn-primary {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #FF6534;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 14px rgba(255, 101, 52, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.auth-btn-primary:hover:not(:disabled) {
+  background-color: #e55325;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 101, 52, 0.36);
+}
+
+.auth-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Subtle Link / Button in Footer */
+.auth-sub-link {
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.auth-sub-link:hover {
+  color: #FF6534;
+  text-decoration: underline;
+}

@@ -1,0 +1,8 @@
+/* Hero Section Background Gradient & Pattern */
+.SAMZ-hero-bg {
+  background: linear-gradient(135deg,
+      #c7cbe2 0%,
+      #d8daf0 45%,
+      #eef0f8 100%);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}

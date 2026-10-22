@@ -1,0 +1,29 @@
+/* Custom CSS for SupportingLinks component */
+
+.supporting-links-bg {
+  background-color: #1A0927;
+}
+
+.supporting-links-accent {
+  color: #FF6534;
+}
+
+.supporting-links-social-btn {
+  background-color: #FF6534;
+  transition: all 0.2s ease-in-out;
+}
+
+.supporting-links-social-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(255, 101, 52, 0.4);
+}
+
+.supporting-links-submit-btn {
+  background-color: #FF6534;
+  transition: background-color 0.2s ease;
+}
+
+.supporting-links-submit-btn:hover {
+  background-color: #e55527;
+}
