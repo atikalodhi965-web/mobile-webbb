@@ -127,16 +127,16 @@ const CartPage = () => {
                 })}
               </div>
 
-              {/* Payment Notice Section matching reference image */}
+              {/* Payment Notice Section */}
               <div className="pt-4 text-xs sm:text-sm text-gray-700 space-y-1">
                 <h4 className="font-bold text-[#1C0D2A] text-sm sm:text-base">
-                  Pay with PayPal or Klarna
+                  Pay with PayPal
                 </h4>
                 <p className="text-gray-600 font-medium">
-                  You can split your payment in 3 with Klarna, or checkout using PayPal.
+                  Checkout securely using PayPal.
                 </p>
                 <p className="text-gray-600 font-medium">
-                  If you don't have a PayPal account, don't worry. You can still go through PayPal as a guest, and checkout using a credit or debit card.
+                  If you don't have a PayPal account, you can still complete checkout as a guest using a credit or debit card.
                 </p>
               </div>
 

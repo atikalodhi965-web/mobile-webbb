@@ -18,6 +18,28 @@ const StatusBadge = ({ active }) =>
     </span>
   );
 
+/* ─── Predefined Model Groups ─── */
+const SAMSUNG_GROUPS = [
+  'Galaxy Flip & Fold series',
+  'Galaxy S series',
+  'Galaxy Note series',
+  'Select device',
+  'Galaxy A series',
+];
+
+const TABLET_GROUPS = [
+  'iPad',
+  'iPad Air',
+  'iPad Mini',
+  'iPad Pro',
+];
+
+const APPLE_LAPTOP_GROUPS = [
+  'Apple MacBook',
+  'MacBook Pro',
+  'MacBook Air',
+];
+
 const COLUMNS = [
   {
     key: 'image',
@@ -100,35 +122,209 @@ const ModelsPage = () => {
     fetchAllBrands()
       .then((res) => {
         const list = res?.items ?? res ?? [];
-        setBrandOptions(list.map((b) => ({ value: b._id, label: b.name })));
+        setBrandOptions(
+          list.map((b) => ({
+            value: b._id,
+            label: b.name,
+            slug: b.slug,
+          }))
+        );
       })
       .catch(() => {});
 
     fetchAllDeviceTypes()
       .then((res) => {
         const list = res?.items ?? res ?? [];
-        setDeviceTypeOptions(list.map((dt) => ({ value: dt._id, label: dt.title })));
+        setDeviceTypeOptions(
+          list.map((dt) => ({
+            value: dt._id,
+            label: dt.title,
+          }))
+        );
       })
       .catch(() => {});
   }, []);
 
-  const FORM_FIELDS = [
-    { name: 'name',          label: 'Model Name',   required: true, placeholder: 'e.g. iPhone 17 Pro Max' },
-    { name: 'slug',          label: 'Slug',          hint: 'Auto-generated if empty' },
-    { name: 'brandId',       label: 'Brand',         type: 'select', required: true, options: brandOptions },
-    { name: 'deviceTypeId',  label: 'Device Type',   type: 'select', required: true, options: deviceTypeOptions },
-    { name: 'categoryGroup', label: 'Group',         placeholder: 'e.g. iPhone 17 Series' },
-    { name: 'modelNumber',   label: 'Model Number',  placeholder: 'A3293' },
-    { name: 'year',          label: 'Year',          placeholder: '2025' },
-    { name: 'sortOrder',     label: 'Sort Order',    type: 'number', placeholder: '0' },
-    { name: 'isActive',      label: 'Active',         type: 'checkbox', defaultValue: true },
-    { name: 'image',         label: 'Image',          type: 'file' },
-  ];
+  // Form fields dynamically computed based on currently selected values
+  const getFormFields = (vals = {}) => {
+    const selectedBrandId = vals.brandId?._id ?? vals.brandId;
+    const selectedBrand = brandOptions.find(
+      (b) => String(b.value) === String(selectedBrandId)
+    );
+
+    const selectedDeviceTypeId = vals.deviceTypeId?._id ?? vals.deviceTypeId;
+    const selectedDeviceType = deviceTypeOptions.find(
+      (dt) => String(dt.value) === String(selectedDeviceTypeId)
+    );
+
+    const selectedDeviceTypeLabel =
+      selectedDeviceType?.label ??
+      vals.deviceTypeId?.title ??
+      vals.deviceTypeId?.name ??
+      '';
+
+    const isTabletDevice = String(selectedDeviceTypeLabel).trim().toLowerCase().includes('tablet');
+    const isLaptopDevice = String(selectedDeviceTypeLabel).trim().toLowerCase().includes('laptop');
+
+    const isAppleBrand = Boolean(
+      (selectedBrand &&
+        (selectedBrand.slug?.toLowerCase() === 'apple' ||
+          selectedBrand.label?.toLowerCase().includes('apple'))) ||
+      (vals.brandId?.name &&
+        vals.brandId.name.toLowerCase().includes('apple')) ||
+      (vals.brandId?.slug &&
+        vals.brandId.slug.toLowerCase().includes('apple'))
+    );
+
+    const isSamsung = Boolean(
+      (selectedBrand &&
+        (selectedBrand.slug?.toLowerCase() === 'samsung' ||
+          selectedBrand.label?.toLowerCase().includes('samsung'))) ||
+      (vals.brandId?.name &&
+        vals.brandId.name.toLowerCase().includes('samsung')) ||
+      (vals.brandId?.slug &&
+        vals.brandId.slug.toLowerCase().includes('samsung'))
+    );
+
+    const samsungOptions = SAMSUNG_GROUPS.map((g) => ({
+      value: g,
+      label: g,
+    }));
+
+    const tabletOptions = TABLET_GROUPS.map((g) => ({
+      value: g,
+      label: g,
+    }));
+
+    const appleLaptopOptions = APPLE_LAPTOP_GROUPS.map((g) => ({
+      value: g,
+      label: g,
+    }));
+
+    // If an existing record has a custom group, keep it selectable
+    if (
+      vals.categoryGroup &&
+      vals.categoryGroup !== '__custom__' &&
+      !SAMSUNG_GROUPS.includes(vals.categoryGroup)
+    ) {
+      samsungOptions.push({
+        value: vals.categoryGroup,
+        label: vals.categoryGroup,
+      });
+    }
+
+    if (
+      vals.categoryGroup &&
+      vals.categoryGroup !== '__custom__' &&
+      !TABLET_GROUPS.includes(vals.categoryGroup)
+    ) {
+      tabletOptions.push({
+        value: vals.categoryGroup,
+        label: vals.categoryGroup,
+      });
+    }
+
+    if (
+      vals.categoryGroup &&
+      vals.categoryGroup !== '__custom__' &&
+      !APPLE_LAPTOP_GROUPS.includes(vals.categoryGroup)
+    ) {
+      appleLaptopOptions.push({
+        value: vals.categoryGroup,
+        label: vals.categoryGroup,
+      });
+    }
+
+    const categoryGroupField = isLaptopDevice && isAppleBrand
+      ? {
+          name: 'categoryGroup',
+          label: 'Group',
+          type: 'select',
+          options: appleLaptopOptions,
+          allowCustom: true,
+          customName: 'categoryGroupCustom',
+          customPlaceholder: 'Or enter custom MacBook group…',
+          hint: 'Predefined groups for Apple MacBook models',
+        }
+      : isTabletDevice
+        ? {
+            name: 'categoryGroup',
+            label: 'Group',
+            type: 'select',
+            options: tabletOptions,
+            allowCustom: true,
+            customName: 'categoryGroupCustom',
+            customPlaceholder: 'Or enter custom tablet group…',
+            hint: 'Predefined groups for iPad models',
+          }
+        : isSamsung
+          ? {
+              name: 'categoryGroup',
+              label: 'Group',
+              type: 'select',
+              options: samsungOptions,
+              allowCustom: true,
+              customName: 'categoryGroupCustom',
+              customPlaceholder: 'Or enter custom Samsung series…',
+              hint: 'Predefined groups for Samsung models',
+            }
+          : {
+              name: 'categoryGroup',
+              label: 'Group',
+              placeholder: 'e.g. iPhone 17 Series',
+              hint: 'Device series or family group',
+            };
+
+    return [
+      {
+        name: 'name',
+        label: 'Model Name',
+        required: true,
+        placeholder: isSamsung ? 'e.g. Galaxy S25 Ultra' : isTabletDevice ? 'e.g. iPad Pro 13-inch' : isLaptopDevice && isAppleBrand ? 'e.g. MacBook Pro 14-inch' : 'e.g. iPhone 17 Pro Max',
+      },
+      { name: 'slug', label: 'Slug', hint: 'Auto-generated if empty' },
+      {
+        name: 'brandId',
+        label: 'Brand',
+        type: 'select',
+        required: true,
+        options: brandOptions,
+        formatValue: (v) => v?._id ?? v ?? '',
+      },
+      {
+        name: 'deviceTypeId',
+        label: 'Device Type',
+        type: 'select',
+        required: true,
+        options: deviceTypeOptions,
+        formatValue: (v) => v?._id ?? v ?? '',
+      },
+      categoryGroupField,
+      {
+        name: 'modelNumber',
+        label: 'Model Number',
+        placeholder: isSamsung ? 'e.g. SM-S938B' : isTabletDevice ? 'e.g. A2899' : isLaptopDevice && isAppleBrand ? 'e.g. MJLQ3HN/A' : 'e.g. A3293',
+      },
+      { name: 'year', label: 'Year', placeholder: '2025' },
+      { name: 'sortOrder', label: 'Sort Order', type: 'number', placeholder: '0' },
+      { name: 'isActive', label: 'Active', type: 'checkbox', defaultValue: true },
+      { name: 'image', label: 'Image', type: 'file' },
+    ];
+  };
 
   const buildPayload = (vals) => {
     const fd = new FormData();
+    const resolvedGroup =
+      vals.categoryGroup === '__custom__'
+        ? (vals.categoryGroupCustom || '').trim()
+        : (vals.categoryGroup || '').trim();
+
     Object.entries(vals).forEach(([k, v]) => {
-      if (k === 'image') {
+      if (k === 'categoryGroup') {
+        fd.append('categoryGroup', resolvedGroup);
+      } else if (k === 'categoryGroupCustom') {
+        // internal field, omit
+      } else if (k === 'image') {
         if (v instanceof File) fd.append('image', v);
       } else {
         fd.append(k, v === true ? 'true' : v === false ? 'false' : v ?? '');
@@ -146,7 +342,7 @@ const ModelsPage = () => {
       searchKeys={['name', 'slug', 'categoryGroup', 'modelNumber', 'year']}
       searchPlaceholder="Search models…"
       resource={resource}
-      formFields={FORM_FIELDS}
+      formFields={getFormFields}
       buildPayload={buildPayload}
     />
   );

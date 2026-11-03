@@ -2,12 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
+import { getModels } from '../../services/catalogService';
 import ipadHeroImg from '../../assets/images/ipad-hero-device.png';
-import {
-  ipadTrustFeatures,
-  ipadCategories,
-  ipadModelsData,
-} from './data/ipadRepairsData';
+import { ipadTrustFeatures, ipadCategories } from './data/ipadRepairsData';
+
+const normalizeText = (value) => String(value ?? '').trim().toLowerCase();
+
+const getIpadGroup = (model) => {
+  const categoryGroup = normalizeText(model?.categoryGroup || '');
+  const modelName = normalizeText(model?.name || '');
+  const source = `${categoryGroup} ${modelName}`;
+
+  if (source.includes('ipad pro')) return 'ipad pro';
+  if (source.includes('ipad mini')) return 'ipad mini';
+  if (source.includes('ipad air')) return 'ipad air';
+  if (source.includes('ipad')) return 'ipad';
+
+  return '';
+};
 
 const IPadRepairs = () => {
   const navigate = useNavigate();
@@ -15,9 +27,66 @@ const IPadRepairs = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showANumberHelp, setShowANumberHelp] = useState(false);
+  const [ipadModels, setIpadModels] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchIpadModels = async () => {
+      try {
+        setIsLoading(true);
+        setError('');
+
+        const response = await getModels({ brand: 'apple', deviceType: 'tablet' });
+        const items = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.models)
+            ? response.models
+            : Array.isArray(response?.data)
+              ? response.data
+              : [];
+
+        const normalizedItems = items.filter((model) => {
+          const deviceTypeName = normalizeText(
+            model?.deviceTypeId?.title || model?.deviceType?.title || model?.deviceTypeName || ''
+          );
+          const group = getIpadGroup(model);
+
+          const matchesTabletType =
+            deviceTypeName.includes('tablet') ||
+            deviceTypeName.includes('ipad') ||
+            group !== '';
+
+          return matchesTabletType && ['ipad', 'ipad air', 'ipad mini', 'ipad pro'].includes(group);
+        });
+
+        if (isMounted) {
+          setIpadModels(normalizedItems.length > 0 ? normalizedItems : items);
+        }
+      } catch (err) {
+        console.error('Failed to load iPad models', err);
+        if (isMounted) {
+          setIpadModels([]);
+          setError('Unable to load iPad models right now.');
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchIpadModels();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const scrollToChooseiPad = () => {
@@ -31,26 +100,35 @@ const IPadRepairs = () => {
     navigate(`/pages/repairs/select-repair/${modelId}`);
   };
 
-  // Combine models based on active tab
   const getModelsForActiveTab = () => {
     if (activeTab === 'all') {
-      return [
-        ...ipadModelsData.ipad,
-        ...ipadModelsData.ipadAir,
-        ...ipadModelsData.ipadMini,
-        ...ipadModelsData.ipadPro,
-      ];
+      return ipadModels;
     }
-    return ipadModelsData[activeTab] || [];
+
+    const tabMap = {
+      ipad: 'ipad',
+      ipadAir: 'ipad air',
+      ipadMini: 'ipad mini',
+      ipadPro: 'ipad pro',
+    };
+
+    const categoryMatch = tabMap[activeTab];
+    if (!categoryMatch) return ipadModels;
+
+    return ipadModels.filter((model) => getIpadGroup(model) === categoryMatch);
   };
 
-  // Filter models based on search query
   const filteredModels = getModelsForActiveTab().filter((model) => {
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase().trim();
+    const modelName = normalizeText(model?.name || '');
+    const modelNumber = normalizeText(model?.modelNumber || '');
+    const categoryGroup = normalizeText(model?.categoryGroup || '');
+
     return (
-      model.name.toLowerCase().includes(query) ||
-      model.modelNumber.toLowerCase().includes(query)
+      modelName.includes(query) ||
+      modelNumber.includes(query) ||
+      categoryGroup.includes(query)
     );
   });
 
@@ -128,21 +206,21 @@ const IPadRepairs = () => {
                   <span>→</span>
                 </button>
 
-                <button
+                {/* <button
                   onClick={scrollToChooseiPad}
                   className="bg-white hover:bg-gray-50 text-[#1F1035] border border-gray-200 font-extrabold text-xs sm:text-sm px-5 py-3 rounded-xl shadow-2xs hover:shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <span>Stores Nationwide</span>
                   <span>→</span>
-                </button>
+                </button> */}
 
-                <button
+                {/* <button
                   onClick={scrollToChooseiPad}
                   className="bg-white hover:bg-gray-50 text-[#1F1035] border border-gray-200 font-extrabold text-xs sm:text-sm px-5 py-3 rounded-xl shadow-2xs hover:shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <span>Mail-In Repair Service</span>
                   <span>→</span>
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -266,37 +344,50 @@ const IPadRepairs = () => {
             })}
           </div>
 
+          {error && !isLoading && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
           {/* Models Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredModels.length > 0 ? (
-              filteredModels.map((model) => (
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, idx) => (
+                <div key={idx} className="rounded-2xl border border-gray-200 bg-white p-4 animate-pulse">
+                  <div className="h-5 w-28 bg-gray-200 rounded-full mb-3" />
+                  <div className="h-8 w-20 bg-gray-100 rounded-md" />
+                </div>
+              ))}
+            </div>
+          ) : filteredModels.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredModels.map((model) => (
                 <div
-                  key={model.id}
-                  onClick={() => handleModelClick(model.id)}
+                  key={model.slug || model._id || model.id}
+                  onClick={() => handleModelClick(model.slug || model._id || model.id)}
                   className="bg-white rounded-2xl p-4 sm:p-5 flex items-center justify-between border border-transparent hover:border-[#FF6534]/40 shadow-2xs hover:shadow-md transition-all cursor-pointer group"
                 >
-                  {/* Model Name */}
                   <span className="font-extrabold text-sm sm:text-base text-[#1F1035] group-hover:text-[#FF6534] transition-colors">
                     {model.name}
                   </span>
 
-                  {/* A-number badge and right arrow */}
                   <div className="flex items-center gap-2">
                     <span className="bg-[#F0EDF5] text-gray-600 font-bold text-xs px-2.5 py-1 rounded-md tracking-wider">
-                      {model.modelNumber}
+                      {model.modelNumber || model.categoryGroup || 'A-number'}
                     </span>
                     <span className="text-[#FF6534] font-bold group-hover:translate-x-1 transition-transform">
                       →
                     </span>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="col-span-full bg-white rounded-2xl p-8 text-center text-gray-500 font-medium">
-                No iPad model found matching "{searchQuery}".
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="col-span-full bg-white rounded-2xl p-8 text-center text-gray-500 font-medium">
+              No iPad model found matching "{searchQuery}".
+            </div>
+          )}
 
         </section>
 

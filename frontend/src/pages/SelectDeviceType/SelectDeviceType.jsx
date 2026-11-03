@@ -18,11 +18,7 @@ const STATIC_DEVICE_TYPES = [
     description: 'Book Samsung repairs, iPhone repairs, Google and more with our SAMZ smartphone repair services.',
     badge: 'Most Popular',
     price: 'From £29',
-<<<<<<< HEAD
-    buttonText: 'Book Smartphone Repair',
-=======
     buttonText: 'Book Now',
->>>>>>> 8f997a0 (Fix frontend tracking)
     href: '/pages/mobile-repairs',
   },
   {
@@ -32,11 +28,7 @@ const STATIC_DEVICE_TYPES = [
     description: 'SAMZ are the experts for all iPad repairs from cracked screens to water damage and battery replacement.',
     badge: 'Same Day Repair',
     price: 'From £49',
-<<<<<<< HEAD
-    buttonText: 'Book iPad Repair',
-=======
     buttonText: 'Book Now',
->>>>>>> 8f997a0 (Fix frontend tracking)
     href: '/pages/repairs/ipad',
   },
   {
@@ -46,11 +38,7 @@ const STATIC_DEVICE_TYPES = [
     description: 'SAMZ have a large collection of dedicated repair centres for Macbooks, laptops and other computer devices',
     badge: 'Express Service',
     price: 'From £69',
-<<<<<<< HEAD
-    buttonText: 'Book Macbook Repair',
-=======
     buttonText: 'Book Now',
->>>>>>> 8f997a0 (Fix frontend tracking)
     href: '/pages/repairs/macbook',
   },
 ];
@@ -63,8 +51,6 @@ const localImageFor = (slug) => {
   return phoneImg;
 };
 
-<<<<<<< HEAD
-=======
 const fallbackRepairHref = (dt) => {
   const slug = String(dt?.slug || dt?.title || '').toLowerCase();
   const href = String(dt?.href || '').trim();
@@ -79,7 +65,6 @@ const fallbackRepairHref = (dt) => {
   return '/pages/repairs';
 };
 
->>>>>>> 8f997a0 (Fix frontend tracking)
 const SelectDeviceType = () => {
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -94,13 +79,8 @@ const SelectDeviceType = () => {
         description: dt.description,
         badge: dt.badge,
         price: dt.priceFrom ? `From £${dt.priceFrom}` : '',
-<<<<<<< HEAD
-        buttonText: dt.buttonText || 'Book Repair',
-        href: dt.href || '/pages/repairs',
-=======
         buttonText: dt.buttonText || 'Book Now',
         href: fallbackRepairHref(dt),
->>>>>>> 8f997a0 (Fix frontend tracking)
       })),
     [apiTypes]
   );

@@ -17,7 +17,6 @@ import {
   Image,
   Shield,
   Users,
-  Images,
 } from 'lucide-react';
 
 export const adminNavSections = [
@@ -65,7 +64,6 @@ export const adminNavSections = [
       { label: 'Reviews', path: '/admin/reviews', icon: Star },
       { label: 'FAQs', path: '/admin/faqs', icon: HelpCircle },
       { label: 'Protection Plan', path: '/admin/protection', icon: Shield },
-      { label: 'Media Library', path: '/admin/media', icon: Images },
     ],
   },
   {

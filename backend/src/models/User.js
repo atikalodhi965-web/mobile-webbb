@@ -54,6 +54,7 @@ userSchema.methods.comparePassword = async function comparePassword(candidate) {
 
 userSchema.methods.toSafeJSON = function toSafeJSON() {
   return {
+    _id: this._id,
     id: this._id,
     name: this.name,
     email: this.email,
@@ -64,6 +65,7 @@ userSchema.methods.toSafeJSON = function toSafeJSON() {
     marketingOptIn: this.marketingOptIn,
     isActive: this.isActive,
     createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
   };
 };
 

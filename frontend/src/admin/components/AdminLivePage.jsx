@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Search, ChevronDown, ChevronUp, Loader2, AlertCircle, ExternalLink } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Search, ChevronDown, ChevronUp, Loader2, AlertCircle } from 'lucide-react';
 import AdminTable from './AdminTable';
 import StatusBadge from './StatusBadge';
 
@@ -19,8 +19,6 @@ import StatusBadge from './StatusBadge';
  *                     { name, label, type, required, options, placeholder, hint, defaultValue, fullWidth, step }
  *                     types: text | number | select | multi-select | checkbox | file | textarea
  *  buildPayload(vals) – converts form values → API payload (object or FormData)
- *  bulkLink         – optional href for the "Add more in bulk" link inside the form
- *                     Defaults to "#" so the link always appears in add mode.
  */
 const AdminLivePage = ({
   title,
@@ -32,7 +30,6 @@ const AdminLivePage = ({
   resource,
   formFields = [],
   buildPayload,
-  bulkLink,          // optional; "Add more in bulk" always shows, href defaults to "#"
   renderCustomForm,
 }) => {
   const { items, loading, saving, error, fetchAll, create, update, remove } = resource;
@@ -43,6 +40,8 @@ const AdminLivePage = ({
   const [editRow,    setEditRow]    = useState(null);   // null = add mode, obj = edit mode
   const [formValues, setFormValues] = useState({});
   const [formError,  setFormError]  = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   /* ── filtered rows ── */
   const filtered = useMemo(() => {
@@ -53,12 +52,32 @@ const AdminLivePage = ({
     );
   }, [items, query, searchKeys]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query, items.length]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
+  const paginatedRows = useMemo(() => {
+    const start = (safePage - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, safePage]);
+
   /* ── default form values ── */
-  const defaultValues = () =>
-    Object.fromEntries(formFields.map((f) => [
-      f.name,
-      f.defaultValue ?? (f.type === 'multi-select' ? [] : ''),
-    ]));
+  const defaultValues = () => {
+    const fields = typeof formFields === 'function' ? formFields({}, null) : formFields;
+    return Object.fromEntries(
+      fields.map((f) => [
+        f.name,
+        f.defaultValue ?? (f.type === 'multi-select' ? [] : ''),
+      ])
+    );
+  };
 
   /* ── open add panel ── */
   const openAdd = () => {
@@ -72,7 +91,8 @@ const AdminLivePage = ({
   const openEdit = (row) => {
     setEditRow(row);
     const vals = {};
-    formFields.forEach((f) => {
+    const fields = typeof formFields === 'function' ? formFields(row, row) : formFields;
+    fields.forEach((f) => {
       const value = f.formatValue ? f.formatValue(row[f.name], row) : row[f.name];
       vals[f.name] = value ?? '';
       if (f.customName) {
@@ -95,7 +115,8 @@ const AdminLivePage = ({
     e.preventDefault();
     setFormError('');
 
-    const missing = formFields.filter((f) => f.required && !formValues[f.name]);
+    const activeFields = typeof formFields === 'function' ? formFields(formValues, editRow) : formFields;
+    const missing = activeFields.filter((f) => f.required && !formValues[f.name]);
     if (missing.length) {
       setFormError(`Please fill in: ${missing.map((f) => f.label).join(', ')}`);
       return;
@@ -128,9 +149,6 @@ const AdminLivePage = ({
     }
     return col;
   });
-
-  /* ── effective bulk link href ── */
-  const bulkHref = bulkLink || '#';
 
   return (
     <div>
@@ -208,14 +226,16 @@ const AdminLivePage = ({
 
             {/* Fields grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {formFields.map((field) => (
+              {(typeof formFields === 'function' ? formFields(formValues, editRow) : formFields).map((field) => (
                 <div key={field.name} className={field.fullWidth ? 'sm:col-span-2 lg:col-span-3' : ''}>
                   <label className="block text-xs font-bold text-[#1F1B2E] mb-1.5 uppercase tracking-wide">
                     {field.label}
                     {field.required && <span className="text-rose-500 ml-0.5">*</span>}
                   </label>
 
-                  {field.type === 'select' ? (
+                  {field.renderInput ? (
+                    field.renderInput({ formValues, handleFieldChange, field, isEdit: !!editRow })
+                  ) : field.type === 'select' ? (
                     <>
                       <select
                         value={formValues[field.name] ?? ''}
@@ -388,7 +408,7 @@ const AdminLivePage = ({
               ))}
             </div>
 
-            {/* ── Form footer: Submit · Cancel · Add more in bulk → ── */}
+            {/* ── Form footer: Submit and Cancel ── */}
             <div className="mt-6 pt-5 border-t border-gray-100 flex flex-wrap items-center gap-3">
               <button
                 type="submit"
@@ -406,19 +426,6 @@ const AdminLivePage = ({
               >
                 Cancel
               </button>
-
-              {/* Bulk link — always visible in add mode, pushed to the right */}
-              {!editRow && (
-                <a
-                  href={bulkHref}
-                  target={bulkLink ? '_blank' : '_self'}
-                  rel="noopener noreferrer"
-                  className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-[#b8370e]/80 hover:text-[#b8370e] hover:underline transition-colors"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  Add more in bulk →
-                </a>
-              )}
             </div>
 
           </form>
@@ -449,16 +456,49 @@ const AdminLivePage = ({
           </div>
         </div>
       ) : (
-        <AdminTable
-          columns={normalisedColumns}
-          rows={filtered}
-          onEdit={openEdit}
-          onDelete={handleDelete}
-        />
+        <>
+          <AdminTable
+            columns={normalisedColumns}
+            rows={paginatedRows}
+            onEdit={openEdit}
+            onDelete={handleDelete}
+          />
+
+          {filtered.length > pageSize && (
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <p className="text-xs text-gray-400 font-medium">
+                Showing {(safePage - 1) * pageSize + 1}-{Math.min(safePage * pageSize, filtered.length)} of {filtered.length} records
+              </p>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={safePage === 1}
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Previous
+                </button>
+
+                <span className="px-2.5 py-1.5 text-sm font-semibold text-[#1F1B2E]">
+                  Page {safePage} of {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                  disabled={safePage === totalPages}
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
-      {/* record count */}
-      {!loading && items.length > 0 && (
+      {!loading && items.length > 0 && filtered.length <= pageSize && (
         <p className="mt-3 text-xs text-gray-400 font-medium">
           Showing {filtered.length} of {items.length} records
         </p>

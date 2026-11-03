@@ -57,14 +57,23 @@ const AdminTable = ({ columns, rows, onEdit, onDelete, onView }) => {
                         </button>
                       )}
                       {onDelete && (
-                        <button
-                          type="button"
-                          onClick={() => onDelete(row)}
-                          className="p-2 rounded-lg text-gray-500 hover:bg-rose-50 hover:text-rose-600 cursor-pointer"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        row.role === 'admin' ? (
+                          <span
+                            className="p-2 text-gray-300 cursor-not-allowed inline-flex items-center"
+                            title="Primary Admin account cannot be deleted"
+                          >
+                            <Trash2 className="w-4 h-4 opacity-30" />
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => onDelete(row)}
+                            className="p-2 rounded-lg text-gray-500 hover:bg-rose-50 hover:text-rose-600 cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )
                       )}
                     </div>
                   </td>

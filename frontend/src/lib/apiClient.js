@@ -19,12 +19,9 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-<<<<<<< HEAD
-=======
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
     }
->>>>>>> 8f997a0 (Fix frontend tracking)
     return config;
   },
   (error) => Promise.reject(error)

@@ -40,7 +40,6 @@ import HeroSlidesPage from '../admin/pages/HeroSlidesPage';
 import ReviewsPage from '../admin/pages/ReviewsPage';
 import FaqsPage from '../admin/pages/FaqsPage';
 import ProtectionPage from '../admin/pages/ProtectionPage';
-import MediaPage from '../admin/pages/MediaPage';
 import UsersPage from '../admin/pages/UsersPage';
 
 /**
@@ -160,7 +159,6 @@ const AppRoutes = () => {
         <Route path="reviews" element={<ReviewsPage />} />
         <Route path="faqs" element={<FaqsPage />} />
         <Route path="protection" element={<ProtectionPage />} />
-        <Route path="media" element={<MediaPage />} />
         <Route path="users" element={<UsersPage />} />
       </Route>
 

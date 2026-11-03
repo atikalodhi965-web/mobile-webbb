@@ -1,17 +1,10 @@
-<<<<<<< HEAD
-import React, { useEffect } from 'react';
-=======
 import React, { useEffect, useMemo, useState } from 'react';
->>>>>>> 8f997a0 (Fix frontend tracking)
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import googlePixelHeroImg from '../../assets/images/google-pixel-hero.png';
 import googleAuthorisedDevicesImg from '../../assets/images/google-authorised-devices.png';
-<<<<<<< HEAD
-=======
 import { getModels } from '../../services/catalogService';
->>>>>>> 8f997a0 (Fix frontend tracking)
 import {
   googleRepairServices,
   googleTrustFeatures,
@@ -21,19 +14,14 @@ import {
 
 const GoogleRepairs = () => {
   const navigate = useNavigate();
-<<<<<<< HEAD
-=======
   const [googleModels, setGoogleModels] = useState([]);
   const [loadingModels, setLoadingModels] = useState(true);
   const [modelsError, setModelsError] = useState('');
->>>>>>> 8f997a0 (Fix frontend tracking)
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-<<<<<<< HEAD
-=======
   useEffect(() => {
     const fetchGoogleModels = async () => {
       try {
@@ -68,7 +56,6 @@ const GoogleRepairs = () => {
     };
   }, [googleModels]);
 
->>>>>>> 8f997a0 (Fix frontend tracking)
   const scrollToSelectPixel = () => {
     const el = document.getElementById('select-pixel');
     if (el) {
@@ -351,19 +338,6 @@ const GoogleRepairs = () => {
             </div>
 
             {/* Models Grid */}
-<<<<<<< HEAD
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {googlePixelModels.map((model) => (
-                <button
-                  key={model.id}
-                  onClick={() => handleModelClick(model.id)}
-                  className="bg-[#F5F3F8] hover:bg-[#F0ECF5] border border-transparent hover:border-[#FF6534]/40 rounded-xl py-3.5 px-4 text-center font-bold text-xs sm:text-sm text-[#1F1035] hover:text-[#FF6534] transition-all cursor-pointer shadow-2xs hover:shadow-xs"
-                >
-                  {model.name}
-                </button>
-              ))}
-            </div>
-=======
             {loadingModels ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -399,7 +373,6 @@ const GoogleRepairs = () => {
                 )}
               </div>
             )}
->>>>>>> 8f997a0 (Fix frontend tracking)
           </div>
         </section>
 
@@ -416,19 +389,6 @@ const GoogleRepairs = () => {
           </div>
 
           {/* Fold Models Container */}
-<<<<<<< HEAD
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto pt-2">
-            {googlePixelFoldModels.map((model) => (
-              <button
-                key={model.id}
-                onClick={() => handleModelClick(model.id)}
-                className="bg-[#F5F3F8] hover:bg-[#F0ECF5] border border-transparent hover:border-[#FF6534]/40 rounded-xl py-4 px-6 text-center font-bold text-xs sm:text-sm text-[#1F1035] hover:text-[#FF6534] transition-all cursor-pointer shadow-2xs hover:shadow-xs"
-              >
-                {model.name}
-              </button>
-            ))}
-          </div>
-=======
           {loadingModels ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto pt-2">
               {[1, 2, 3].map((i) => (
@@ -460,7 +420,6 @@ const GoogleRepairs = () => {
               )}
             </div>
           )}
->>>>>>> 8f997a0 (Fix frontend tracking)
         </section>
 
       </main>

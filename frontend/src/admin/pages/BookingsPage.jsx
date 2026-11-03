@@ -1,33 +1,3 @@
-<<<<<<< HEAD
-import React from 'react';
-import AdminResourcePage from '../components/AdminResourcePage';
-import StatusBadge from '../components/StatusBadge';
-import { bookings } from '../data/staticAdminData';
-
-const BookingsPage = () => (
-  <AdminResourcePage
-    title="Repair Bookings"
-    subtitle="Visit-us and mail-in appointments — update status and store"
-    actionLabel="New Booking"
-    searchKeys={['id', 'customer', 'device', 'repair', 'method', 'store', 'status']}
-    searchPlaceholder="Search bookings…"
-    rows={bookings}
-    columns={[
-      { key: 'id', label: 'Booking' },
-      { key: 'customer', label: 'Customer' },
-      { key: 'device', label: 'Device' },
-      { key: 'repair', label: 'Repair' },
-      {
-        key: 'method',
-        label: 'Method',
-        render: (r) => <span className="capitalize">{r.method.replace(/-/g, ' ')}</span>,
-      },
-      { key: 'store', label: 'Store' },
-      {
-        key: 'schedule',
-        label: 'Schedule',
-        render: (r) => `${r.date}${r.time !== '—' ? ` · ${r.time}` : ''}`,
-=======
 import React, { useEffect, useState, useMemo } from 'react';
 import AdminLivePage from '../components/AdminLivePage';
 import StatusBadge from '../components/StatusBadge';
@@ -215,31 +185,19 @@ const BookingsPage = () => {
             </span>
           );
         },
->>>>>>> 8f997a0 (Fix frontend tracking)
       },
       {
         key: 'total',
         label: 'Total',
-<<<<<<< HEAD
-        render: (r) => `£${r.total}`,
-=======
         render: (r) => (
           <span className="font-bold text-[#b8370e] text-sm">
             £{r.total !== undefined ? Number(r.total).toFixed(2) : '0.00'}
           </span>
         ),
->>>>>>> 8f997a0 (Fix frontend tracking)
       },
       {
         key: 'status',
         label: 'Status',
-<<<<<<< HEAD
-        render: (r) => <StatusBadge status={r.status} />,
-      },
-    ]}
-  />
-);
-=======
         render: (r) => <StatusBadge status={r.status || 'pending'} />,
       },
     ],
@@ -735,6 +693,5 @@ const BookingFormModal = ({
     </div>
   );
 };
->>>>>>> 8f997a0 (Fix frontend tracking)
 
 export default BookingsPage;

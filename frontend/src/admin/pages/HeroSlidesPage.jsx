@@ -1,31 +1,4 @@
 import React from 'react';
-<<<<<<< HEAD
-import AdminResourcePage from '../components/AdminResourcePage';
-import StatusBadge from '../components/StatusBadge';
-import { heroSlides } from '../data/staticAdminData';
-
-const HeroSlidesPage = () => (
-  <AdminResourcePage
-    title="Hero Slides"
-    subtitle="Homepage banners and call-to-action slides"
-    actionLabel="Add Slide"
-    searchKeys={['title', 'subtitle', 'cta']}
-    searchPlaceholder="Search slides…"
-    rows={heroSlides}
-    columns={[
-      { key: 'id', label: 'ID' },
-      { key: 'title', label: 'Title' },
-      { key: 'subtitle', label: 'Subtitle' },
-      { key: 'cta', label: 'CTA' },
-      {
-        key: 'isActive',
-        label: 'Status',
-        render: (r) => <StatusBadge status={r.isActive ? 'active' : 'inactive'} />,
-      },
-    ]}
-  />
-);
-=======
 import AdminLivePage from '../components/AdminLivePage';
 import StatusBadge from '../components/StatusBadge';
 import TableImage from '../components/TableImage';
@@ -157,6 +130,5 @@ const HeroSlidesPage = () => {
     />
   );
 };
->>>>>>> 8f997a0 (Fix frontend tracking)
 
 export default HeroSlidesPage;

@@ -34,6 +34,23 @@ const RepairBookingFlow = () => {
   const [currentStep, setCurrentStep] = useState('method-selection');
   const [selectedMethod, setSelectedMethod] = useState(null);
 
+  const parsePriceValue = (value) => {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+      const numeric = Number(value.replace(/[^0-9.]/g, ''));
+      return Number.isFinite(numeric) ? numeric : 0;
+    }
+    return 0;
+  };
+
+  const repairPriceValue = parsePriceValue(
+    repairInfo?.priceNumber ?? repairInfo?.price ?? repairInfo?.amount ?? repairInfo?.cost ?? 0
+  );
+  const repairTitle = repairInfo?.title || repairInfo?.name || `${deviceName} Repair`;
+  const repairPriceDisplay = Number(repairPriceValue).toFixed(2);
+  const mailInPackFee = selectedMethod === 'mail-in' ? 10 : 0;
+  const repairTotalValue = repairPriceValue + mailInPackFee;
+
   // Service Centre Search State (for Visit Us)
   const [postcodeQuery, setPostcodeQuery] = useState('');
   const [selectedStore, setSelectedStore] = useState(null); // store id string
@@ -104,14 +121,16 @@ const RepairBookingFlow = () => {
     sendOffers: false,
     agreeTerms: false,
   });
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [formError, setFormError] = useState('');
 
   // Confirm Purchase cart items
   const [cartItems, setCartItems] = useState([
     {
       id: 'repair-1',
-      name: `${deviceName} Screen Replacement`,
-      specs: 'White / - / End of Life',
-      price: 79,
+      name: `${deviceName} ${repairTitle}`,
+      specs: 'Service selected / includes diagnostics',
+      price: repairPriceValue,
       qty: 1,
       icon: 'repair',
     },
@@ -119,7 +138,7 @@ const RepairBookingFlow = () => {
       id: 'mail-pack',
       name: 'Post in pack (Do not remove from basket)',
       specs: 'NA',
-      price: 10,
+      price: selectedMethod === 'mail-in' ? 10 : 0,
       qty: 1,
       icon: 'pack',
       locked: true,
@@ -196,37 +215,91 @@ const RepairBookingFlow = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const validateConfirmDetails = () => {
+    const errors = {};
+
+    const requiredFields = [
+      ['firstName', 'First name is required.'],
+      ['lastName', 'Last name is required.'],
+      ['email', 'Email is required.'],
+      ['phone', 'Phone number is required.'],
+      ['devicePasscode', 'Device passcode is required.'],
+    ];
+
+    requiredFields.forEach(([field, message]) => {
+      if (!String(formData[field] || '').trim()) {
+        errors[field] = message;
+      }
+    });
+
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address.';
+    }
+
+    if (selectedMethod === 'visit-us' && (!selectedDate || !selectedTime)) {
+      errors.schedule = 'Please select a date and time before continuing.';
+    }
+
+    if (!formData.agreeTerms) {
+      errors.agreeTerms = 'You must agree to the terms and conditions.';
+    }
+
+    return errors;
+  };
+
   // Continue from Confirm Details to Confirm Purchase
   // Also submit the booking to the backend
   const handleContinueToCart = async () => {
-    // Build booking payload for backend
+    const errors = validateConfirmDetails();
+
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setFormError('Please fix the highlighted fields before continuing.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    setFormError('');
+
     try {
       const appointmentDate = selectedDate && calYear && calMonth !== null
         ? `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(selectedDate).padStart(2, '0')}`
         : undefined;
 
-      await submitBooking({
-        repairId: repairInfo?.id ?? repairInfo?._id ?? undefined,
-        modelSlug: location.state?.device?.toLowerCase().replace(/\s+/g, '-') ?? undefined,
+      const repairServiceId = repairInfo?._id || repairInfo?.id || null;
+
+      const payload = {
         method: selectedMethod,
-        appointmentDate,
-        appointmentTime: selectedTime ?? undefined,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        postcode: formData.postcode,
-        devicePasscode: formData.devicePasscode,
-        mobileNetwork: formData.mobileNetwork !== 'Mobile Network' ? formData.mobileNetwork : undefined,
-        additionalInfo: formData.additionalInfo,
-        sendOffers: formData.sendOffers,
-      });
+        deviceName: deviceName,
+        deviceModelId: location.state?.modelId || undefined,
+        repairServiceIds: repairServiceId ? [repairServiceId] : [],
+        storeId: selectedMethod === 'visit-us' ? (selectedStore || backendStore?._id || undefined) : undefined,
+        appointmentDate: selectedMethod === 'visit-us' ? appointmentDate : undefined,
+        appointmentTime: selectedMethod === 'visit-us' ? selectedTime : undefined,
+        mailInPackFee: selectedMethod === 'mail-in' ? 10 : 0,
+        customer: {
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          postcode: formData.postcode.trim(),
+          devicePasscode: formData.devicePasscode.trim(),
+          mobileNetwork: formData.mobileNetwork && formData.mobileNetwork !== 'Mobile Network'
+            ? formData.mobileNetwork
+            : '',
+          additionalInfo: formData.additionalInfo.trim(),
+        },
+        sendOffers: !!formData.sendOffers,
+        agreeTerms: !!formData.agreeTerms,
+      };
+
+      await submitBooking(payload);
+      setCurrentStep('confirm-purchase');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      // Non-blocking: still proceed to confirm-purchase screen even if booking API fails
-      console.warn('Booking API error (proceeding anyway):', err?.message);
+      console.error('Booking API error:', err);
+      setFormError(err?.message || 'Unable to save your booking details. Please try again.');
     }
-    setCurrentStep('confirm-purchase');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Checkout from Confirm Purchase
@@ -253,6 +326,29 @@ const RepairBookingFlow = () => {
       prev.map((item) => (item.id === id ? { ...item, qty } : item))
     );
   };
+
+  useEffect(() => {
+    setCartItems((prev) =>
+      prev.map((item) => {
+        if (item.id === 'repair-1') {
+          return {
+            ...item,
+            name: `${deviceName} ${repairTitle}`,
+            price: repairPriceValue,
+          };
+        }
+
+        if (item.id === 'mail-pack') {
+          return {
+            ...item,
+            price: selectedMethod === 'mail-in' ? 10 : 0,
+          };
+        }
+
+        return item;
+      })
+    );
+  }, [deviceName, repairTitle, repairPriceValue, selectedMethod]);
 
   const cartTotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
 
@@ -790,74 +886,88 @@ const RepairBookingFlow = () => {
                 </h2>
 
                 <div className="space-y-3">
-                  {/* First Name & Last Name */}
                   <div className="grid grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      placeholder="First Name*"
-                      value={formData.firstName}
-                      onChange={(e) => setFormData((p) => ({ ...p, firstName: e.target.value }))}
-                      className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Last Name*"
-                      value={formData.lastName}
-                      onChange={(e) => setFormData((p) => ({ ...p, lastName: e.target.value }))}
-                      className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors"
-                    />
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="First Name*"
+                        value={formData.firstName}
+                        onChange={(e) => setFormData((p) => ({ ...p, firstName: e.target.value }))}
+                        className={`w-full px-3 py-2.5 text-sm rounded-lg border bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors ${fieldErrors.firstName ? 'border-red-400' : 'border-gray-300'}`}
+                      />
+                      {fieldErrors.firstName && <p className="mt-1 text-xs text-red-600">{fieldErrors.firstName}</p>}
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Last Name*"
+                        value={formData.lastName}
+                        onChange={(e) => setFormData((p) => ({ ...p, lastName: e.target.value }))}
+                        className={`w-full px-3 py-2.5 text-sm rounded-lg border bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors ${fieldErrors.lastName ? 'border-red-400' : 'border-gray-300'}`}
+                      />
+                      {fieldErrors.lastName && <p className="mt-1 text-xs text-red-600">{fieldErrors.lastName}</p>}
+                    </div>
                   </div>
 
-                  {/* Email */}
-                  <input
-                    type="email"
-                    placeholder="Email*"
-                    value={formData.email}
-                    onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors"
-                  />
-
-                  {/* Phone & Postcode */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div>
                     <input
-                      type="tel"
-                      placeholder="Phone*"
-                      value={formData.phone}
-                      onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
-                      className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors"
+                      type="email"
+                      placeholder="Email*"
+                      value={formData.email}
+                      onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
+                      className={`w-full px-3 py-2.5 text-sm rounded-lg border bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors ${fieldErrors.email ? 'border-red-400' : 'border-gray-300'}`}
                     />
-                    <input
-                      type="text"
-                      placeholder="Postcode"
-                      value={formData.postcode}
-                      onChange={(e) => setFormData((p) => ({ ...p, postcode: e.target.value }))}
-                      className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors"
-                    />
+                    {fieldErrors.email && <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>}
                   </div>
 
-                  {/* Device Passcode & Mobile Network */}
                   <div className="grid grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      placeholder="Device Passcode*"
-                      value={formData.devicePasscode}
-                      onChange={(e) => setFormData((p) => ({ ...p, devicePasscode: e.target.value }))}
-                      className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors"
-                    />
-                    <select
-                      value={formData.mobileNetwork}
-                      onChange={(e) => setFormData((p) => ({ ...p, mobileNetwork: e.target.value }))}
-                      className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors text-gray-600 cursor-pointer"
-                    >
-                      {mobileNetworks.map((n) => (
-                        <option key={n} value={n}>
-                          {n}
-                        </option>
-                      ))}
-                    </select>
+                    <div>
+                      <input
+                        type="tel"
+                        placeholder="Phone*"
+                        value={formData.phone}
+                        onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
+                        className={`w-full px-3 py-2.5 text-sm rounded-lg border bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors ${fieldErrors.phone ? 'border-red-400' : 'border-gray-300'}`}
+                      />
+                      {fieldErrors.phone && <p className="mt-1 text-xs text-red-600">{fieldErrors.phone}</p>}
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Postcode"
+                        value={formData.postcode}
+                        onChange={(e) => setFormData((p) => ({ ...p, postcode: e.target.value }))}
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors"
+                      />
+                    </div>
                   </div>
 
-                  {/* Additional Info */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Device Passcode*"
+                        value={formData.devicePasscode}
+                        onChange={(e) => setFormData((p) => ({ ...p, devicePasscode: e.target.value }))}
+                        className={`w-full px-3 py-2.5 text-sm rounded-lg border bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors ${fieldErrors.devicePasscode ? 'border-red-400' : 'border-gray-300'}`}
+                      />
+                      {fieldErrors.devicePasscode && <p className="mt-1 text-xs text-red-600">{fieldErrors.devicePasscode}</p>}
+                    </div>
+                    <div>
+                      <select
+                        value={formData.mobileNetwork}
+                        onChange={(e) => setFormData((p) => ({ ...p, mobileNetwork: e.target.value }))}
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#FF6534] focus:ring-1 focus:ring-[#FF6534] transition-colors text-gray-600 cursor-pointer"
+                      >
+                        {mobileNetworks.map((n) => (
+                          <option key={n} value={n}>
+                            {n}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1">
                       Any additional information? (Optional)
@@ -885,11 +995,14 @@ const RepairBookingFlow = () => {
                     <div className="flex-1">
                       <p className="text-xs font-extrabold text-[#FF6534] mb-1">Repair Type:</p>
                       <p className="text-sm font-semibold text-gray-800 leading-snug">
-                        {repairInfo.title || `${deviceName} ${repairInfo.id || 'Screen Replacement'}`}
+                        {repairTitle}
                       </p>
+                      {repairInfo?.description && (
+                        <p className="text-[11px] text-gray-600 mt-1 leading-snug">{repairInfo.description}</p>
+                      )}
                       <p className="text-xs font-extrabold text-[#FF6534] mt-2">Repair Price:</p>
                       <p className="text-sm font-bold text-gray-800">
-                        {repairInfo.price || '£79'}
+                        £{repairPriceDisplay}
                       </p>
                     </div>
                     <div className="w-10 h-12 rounded-md border-2 border-[#2B0A3D] bg-gray-50 flex items-center justify-center shrink-0">
@@ -948,7 +1061,7 @@ const RepairBookingFlow = () => {
                     <p className="text-sm font-bold text-gray-800">
                       Total cost:{' '}
                       <span className="text-[#FF6534] font-extrabold text-base">
-                        £{selectedMethod === 'mail-in' ? '89' : '79'}
+                        £{repairTotalValue.toFixed(2)}
                       </span>
                     </p>
                   </div>
@@ -958,6 +1071,18 @@ const RepairBookingFlow = () => {
 
             {/* Checkboxes & Continue to Payment */}
             <div className="mt-6 flex flex-col items-center gap-3">
+              {formError && (
+                <div className="max-w-2xl w-full rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 font-medium">
+                  {formError}
+                </div>
+              )}
+
+              {fieldErrors.schedule && (
+                <div className="max-w-2xl w-full text-left text-xs text-red-600 font-medium">
+                  {fieldErrors.schedule}
+                </div>
+              )}
+
               <label className="flex items-start gap-2.5 cursor-pointer max-w-2xl w-full">
                 <input
                   type="checkbox"
@@ -971,20 +1096,25 @@ const RepairBookingFlow = () => {
                 </span>
               </label>
 
-              <label className="flex items-start gap-2.5 cursor-pointer max-w-2xl w-full">
-                <input
-                  type="checkbox"
-                  checked={formData.agreeTerms}
-                  onChange={(e) => setFormData((p) => ({ ...p, agreeTerms: e.target.checked }))}
-                  className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-[#FF6534] cursor-pointer"
-                />
-                <span className="text-xs text-gray-600 font-medium">
-                  I agree to the{' '}
-                  <a href="/terms-conditions" className="text-[#FF6534] font-bold hover:underline">
-                    Terms &amp; Conditions. *
-                  </a>
-                </span>
-              </label>
+              <div className="max-w-2xl w-full">
+                <label className="flex items-start gap-2.5 cursor-pointer w-full">
+                  <input
+                    type="checkbox"
+                    checked={formData.agreeTerms}
+                    onChange={(e) => setFormData((p) => ({ ...p, agreeTerms: e.target.checked }))}
+                    className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-[#FF6534] cursor-pointer"
+                  />
+                  <span className="text-xs text-gray-600 font-medium">
+                    I agree to the{' '}
+                    <a href="/terms-conditions" className="text-[#FF6534] font-bold hover:underline">
+                      Terms &amp; Conditions. *
+                    </a>
+                  </span>
+                </label>
+                {fieldErrors.agreeTerms && (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.agreeTerms}</p>
+                )}
+              </div>
 
               <button
                 type="button"
@@ -1073,14 +1203,13 @@ const RepairBookingFlow = () => {
               {/* Payment notice */}
               <div className="mt-6 pt-4 border-t border-blue-200/60 text-xs sm:text-sm text-gray-700 space-y-1">
                 <h4 className="font-bold text-[#1C0D2A] text-sm sm:text-base">
-                  Pay with PayPal or Klarna
+                  Pay with PayPal
                 </h4>
                 <p className="text-gray-600 font-medium">
-                  You can split your payment in 3 with Klarna, or checkout using PayPal.
+                  Checkout securely using PayPal.
                 </p>
                 <p className="text-gray-600 font-medium">
-                  If you don't have a PayPal account, don't worry. You can still go through PayPal
-                  as a guest, and checkout using a credit or debit card.
+                  If you don't have a PayPal account, you can still complete checkout as a guest using a credit or debit card.
                 </p>
               </div>
 

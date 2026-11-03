@@ -1,14 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import macbookHeroImg from '../../assets/images/macbook-hero-device.png';
-import { macbookCategories } from './data/macbookRepairsData';
+import { getModels } from '../../services/catalogService';
+import { getMediaUrl } from '../../services/mediaService';
+
+const normalizeText = (value) => String(value ?? '').trim().toLowerCase();
+
+const MACBOOK_GROUPS = [
+  { id: 'apple-macbook', title: 'Apple MacBook' },
+  { id: 'macbook-pro', title: 'MacBook Pro' },
+  { id: 'macbook-air', title: 'MacBook Air' },
+];
+
+const getMacbookGroup = (model) => {
+  const categoryGroup = normalizeText(model?.categoryGroup || '');
+  const modelName = normalizeText(model?.name || '');
+  const source = `${categoryGroup} ${modelName}`;
+
+  if (source.includes('macbook pro')) return 'MacBook Pro';
+  if (source.includes('macbook air')) return 'MacBook Air';
+  if (source.includes('macbook')) return 'Apple MacBook';
+  return '';
+};
+
+const getModelImage = (model) => {
+  const image = model?.image || model?.images?.[0] || model?.thumbnail || model?.imageUrl || '';
+  return getMediaUrl(image, macbookHeroImg);
+};
 
 const MacbookRepairs = () => {
   const navigate = useNavigate();
   const [showModelHelp, setShowModelHelp] = useState(false);
   const [openFaq, setOpenFaq] = useState({ 0: false, 1: false });
+  const [macbookModels, setMacbookModels] = useState([]);
+  const [loadingModels, setLoadingModels] = useState(true);
+  const [modelsError, setModelsError] = useState('');
 
   const toggleFaq = (index) => {
     setOpenFaq((prev) => ({
@@ -20,6 +48,60 @@ const MacbookRepairs = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchMacbookModels = async () => {
+      try {
+        setLoadingModels(true);
+        setModelsError('');
+
+        const response = await getModels({ brand: 'apple', deviceType: 'laptop' });
+        const items = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.models)
+            ? response.models
+            : Array.isArray(response?.data)
+              ? response.data
+              : [];
+
+        const filtered = items.filter((model) => {
+          const group = getMacbookGroup(model);
+          return ['Apple MacBook', 'MacBook Pro', 'MacBook Air'].includes(group);
+        });
+
+        if (isMounted) {
+          setMacbookModels(filtered.length > 0 ? filtered : items);
+        }
+      } catch (err) {
+        console.error('Failed to load MacBook models', err);
+        if (isMounted) {
+          setMacbookModels([]);
+          setModelsError('Unable to load MacBook models right now.');
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingModels(false);
+        }
+      }
+    };
+
+    fetchMacbookModels();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const groupedMacbookModels = useMemo(
+    () =>
+      MACBOOK_GROUPS.map((group) => ({
+        ...group,
+        models: macbookModels.filter((model) => getMacbookGroup(model) === group.title),
+      })),
+    [macbookModels]
+  );
 
   const scrollToSelectMacbook = () => {
     const el = document.getElementById('select-macbook');
@@ -158,63 +240,85 @@ const MacbookRepairs = () => {
         </section>
 
 
-        {/* SECTION 3: MACBOOK MODELS GRID SECTIONS (Matches Images 3 & 4) */}
+        {/* SECTION 3: MACBOOK MODELS GRID SECTIONS */}
         <section className="space-y-12 pt-4">
-          {macbookCategories.map((category, index) => (
-            <div key={category.categoryTitle} className="space-y-8">
-
-              {/* Category Header */}
-              <div className="text-center">
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-[#1F1035] tracking-tight">
-                  {category.categoryTitle}
-                </h3>
-              </div>
-
-              {/* Models Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8 justify-center">
-                {category.models.map((model) => (
-                  <div
-                    key={model.id}
-                    onClick={() => handleModelClick(model.id)}
-                    className="bg-white rounded-2xl p-6 border border-transparent hover:border-[#FF6534]/30 shadow-2xs hover:shadow-lg transition-all duration-200 flex flex-col items-center text-center space-y-3 cursor-pointer group"
-                  >
-                    {/* Laptop Illustration Mock */}
-                    <div className="w-full h-32 flex items-center justify-center relative p-2">
-                      <div className="bg-gradient-to-b from-gray-700 to-gray-900 rounded-t-xl w-36 h-24 p-2 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
-                        <div className="w-full h-full bg-slate-800 rounded flex items-center justify-center overflow-hidden border border-slate-600">
-                          {/* Screen backdrop artwork */}
-                          <div className="w-full h-full bg-gradient-to-tr from-amber-500/20 via-orange-500/30 to-slate-900"></div>
-                        </div>
-                      </div>
-                      {/* Laptop base bar */}
-                      <div className="absolute bottom-2 w-44 h-2 bg-gray-300 rounded-b-md shadow-xs"></div>
-                    </div>
-
-                    {/* Model Title */}
-                    <h4 className="text-sm sm:text-base font-extrabold text-[#FF6534] group-hover:text-[#e05020] transition-colors leading-tight">
-                      {model.title}
-                    </h4>
-
-                    {/* Model Number */}
-                    <p className="text-xs sm:text-sm font-bold text-[#1F1035]">
-                      Model number: {model.modelNumber}
-                    </p>
-
-                    {/* Release Year */}
-                    <p className="text-xs text-gray-500 font-medium">
-                      {model.year}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Category Divider Line (if not last) */}
-              {index < macbookCategories.length - 1 && (
-                <div className="w-full h-[1px] bg-slate-300 my-10 max-w-4xl mx-auto"></div>
-              )}
-
+          {modelsError && !loadingModels && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {modelsError}
             </div>
-          ))}
+          )}
+
+          {loadingModels ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
+              {[...Array(8)].map((_, index) => (
+                <div key={index} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse">
+                  <div className="h-32 bg-gray-200 rounded-xl mb-4" />
+                  <div className="h-4 w-28 bg-gray-200 rounded-full mx-auto mb-3" />
+                  <div className="h-3 w-24 bg-gray-100 rounded-full mx-auto" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            groupedMacbookModels.map((category, index) => {
+              if (!category.models.length) return null;
+
+              return (
+                <div key={category.id} className="space-y-8">
+                  <div className="text-center">
+                    <h3 className="text-2xl sm:text-3xl font-extrabold text-[#1F1035] tracking-tight">
+                      {category.title}
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8 justify-center">
+                    {category.models.map((model) => {
+                      const modelId = model?.slug || model?._id || model?.id || model?.name;
+                      const modelName = model?.name || 'MacBook';
+                      const modelImage = getModelImage(model);
+
+                      return (
+                        <div
+                          key={modelId}
+                          onClick={() => handleModelClick(modelId)}
+                          className="bg-white rounded-2xl p-6 border border-transparent hover:border-[#FF6534]/30 shadow-2xs hover:shadow-lg transition-all duration-200 flex flex-col items-center text-center space-y-3 cursor-pointer group"
+                        >
+                          <div className="w-full h-32 flex items-center justify-center relative p-2">
+                            <div className="w-full h-full rounded-xl bg-[#F5F7FB] border border-slate-200 flex items-center justify-center overflow-hidden p-2 group-hover:scale-105 transition-transform">
+                              <img
+                                src={modelImage}
+                                alt={modelName}
+                                className="max-h-full max-w-full object-contain"
+                                onError={(event) => {
+                                  event.currentTarget.onerror = null;
+                                  event.currentTarget.src = macbookHeroImg;
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          <h4 className="text-sm sm:text-base font-extrabold text-[#FF6534] group-hover:text-[#e05020] transition-colors leading-tight">
+                            {modelName}
+                          </h4>
+
+                          <p className="text-xs sm:text-sm font-bold text-[#1F1035]">
+                            Model number: {model?.modelNumber || '—'}
+                          </p>
+
+                          <p className="text-xs text-gray-500 font-medium">
+                            {model?.year || model?.releaseYear || '—'}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {index < groupedMacbookModels.length - 1 && (
+                    <div className="w-full h-[1px] bg-slate-300 my-10 max-w-4xl mx-auto" />
+                  )}
+                </div>
+              );
+            })
+          )}
         </section>
 
         {/* SECTION 4: FAQ ACCORDION SECTION (Matches attached picture) */}

@@ -10,8 +10,6 @@ const {
   getOrder,
   updateOrderStatus,
   listPayments,
-  listUsers,
-  updateUser,
 } = require('../../controllers/admin/bookingOrderController');
 
 const router = express.Router();
@@ -28,8 +26,5 @@ router.get('/orders/:id', getOrder);
 router.patch('/orders/:id/status', updateOrderStatus);
 
 router.get('/payments', listPayments);
-
-router.get('/users', listUsers);
-router.patch('/users/:id', updateUser);
 
 module.exports = router;

@@ -11,8 +11,6 @@ import Footer from '../../components/Footer/Footer';
 import { useRepairCategories, useRepairsForModel } from '../../hooks/useRepairs';
 import { repairCategories as staticCategories, getModelRepairData } from './data/selectRepairData';
 
-<<<<<<< HEAD
-=======
 const normalizeId = (value) => {
   if (!value) return '';
   if (typeof value === 'string' || typeof value === 'number') return String(value);
@@ -24,7 +22,6 @@ const normalizeId = (value) => {
   return String(value);
 };
 
->>>>>>> 8f997a0 (Fix frontend tracking)
 const SelectRepairScreen = () => {
   const { modelId } = useParams();
   const navigate = useNavigate();
@@ -50,11 +47,7 @@ const SelectRepairScreen = () => {
   const categories = useMemo(() => {
     if (!catsLoading && apiCategories.length > 0) {
       return apiCategories.map((cat) => ({
-<<<<<<< HEAD
-        id: cat._id ?? cat.id ?? cat.slug,
-=======
         id: normalizeId(cat._id ?? cat.id ?? cat.slug),
->>>>>>> 8f997a0 (Fix frontend tracking)
         title: cat.name ?? cat.title,
         shortTitle: cat.name ?? cat.title,
         icon: cat.icon ?? 'battery',
@@ -63,13 +56,6 @@ const SelectRepairScreen = () => {
     return staticCategories;
   }, [apiCategories, catsLoading]);
 
-<<<<<<< HEAD
-  // Set default active category once categories are available
-  useEffect(() => {
-    if (categories.length > 0 && !activeCategory) {
-      setActiveCategory(categories[0].id);
-    }
-=======
   // Ensure a category is always selected when categories are available.
   useEffect(() => {
     if (categories.length === 0) return;
@@ -79,29 +65,10 @@ const SelectRepairScreen = () => {
       if (prev && categories.some((cat) => String(cat.id) === String(prev))) return prev;
       return firstCategoryId;
     });
->>>>>>> 8f997a0 (Fix frontend tracking)
   }, [categories]);
 
   // ── Repair options for current category ───────────────────────────────────
   const currentOptions = useMemo(() => {
-<<<<<<< HEAD
-    // If backend has repairs, group them by category
-    if (!repairsLoading && apiRepairs.length > 0) {
-      return apiRepairs.filter((r) => {
-        const rCatId = r.category?._id ?? r.category?.id ?? r.category ?? r.categoryId;
-        return rCatId === activeCategory || r.categorySlug === activeCategory;
-      }).map((r) => ({
-        id: r._id ?? r.id,
-        title: r.name ?? r.title,
-        price: r.price !== undefined ? `£${r.price}` : 'POA',
-        priceNumber: r.price ?? 0,
-        icon: r.icon ?? r.category?.icon ?? 'battery',
-        description: r.description ?? '',
-        warranty: r.warranty ?? '12 months',
-        repairTime: r.repairTime ?? 'Up to 60 minutes',
-        note: r.note ?? '',
-      }));
-=======
     const currentGrouped = apiRepairs.length > 0 ? apiRepairs : [];
 
     if (!repairsLoading && currentGrouped.length > 0) {
@@ -124,7 +91,6 @@ const SelectRepairScreen = () => {
           note: r.note ?? '',
         }));
       }
->>>>>>> 8f997a0 (Fix frontend tracking)
     }
 
     // Fall back to static data

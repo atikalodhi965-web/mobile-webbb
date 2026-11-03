@@ -11,6 +11,7 @@ import RefurbishedBanner from './components/RefurbishedBanner';
 import RefurbishedFilters from './components/RefurbishedFilters';
 import RefurbishedCard from './components/RefurbishedCard';
 import { useProducts } from '../../hooks/useProducts';
+import { mapProduct } from '../../utils/productMapper';
 
 const RefurbishedDevices = () => {
   const [selectedPrice, setSelectedPrice] = useState(600);
@@ -25,22 +26,19 @@ const RefurbishedDevices = () => {
 
   // Normalise backend product shape to match what RefurbishedCard expects
   const products = useMemo(() => {
-    return apiProducts.map((p) => ({
-      id: p._id ?? p.id,
-      name: p.name,
-      brand: p.brand?.name ?? p.brand ?? '',
-      price: p.variants?.[0]?.price ?? p.price ?? 0,
-      image: p.images?.[0] ?? p.image ?? null,
-      capacities: p.variants
-        ? [...new Set(p.variants.map((v) => v.storage ?? v.capacity).filter(Boolean))]
-        : p.capacities ?? [],
-      conditions: p.variants
-        ? [...new Set(p.variants.map((v) => v.condition).filter(Boolean))]
-        : p.conditions ?? [],
-      slug: p.slug,
-      // Pass through the rest for RefurbishedCard
-      ...p,
-    }));
+    return apiProducts.map((p) => {
+      const mapped = mapProduct(p);
+      return {
+        ...mapped,
+        price: p.variants?.[0]?.price ?? mapped.price ?? 0,
+        capacities: p.variants
+          ? [...new Set(p.variants.map((v) => v.storage ?? v.capacity).filter(Boolean))]
+          : mapped.capacities ?? [],
+        conditions: p.variants
+          ? [...new Set(p.variants.map((v) => v.condition).filter(Boolean))]
+          : mapped.conditions ?? [],
+      };
+    });
   }, [apiProducts]);
 
   // Filter handlers

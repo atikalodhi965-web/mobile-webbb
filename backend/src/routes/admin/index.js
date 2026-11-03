@@ -9,7 +9,7 @@ const repairRoutes = require('./repair.routes');
 const productRoutes = require('./product.routes');
 const cmsRoutes = require('./cms.routes');
 const bookingOrderRoutes = require('./bookingOrder.routes');
-const mediaRoutes = require('./media.routes');
+const userRoutes = require('./user.routes');
 
 const router = express.Router();
 
@@ -24,7 +24,7 @@ router.use('/catalog', catalogRoutes);
 router.use('/repairs', repairRoutes);
 router.use('/products', productRoutes);
 router.use('/cms', cmsRoutes);
+router.use('/users', userRoutes);
 router.use('/', bookingOrderRoutes);
-router.use('/media', mediaRoutes);
 
 module.exports = router;

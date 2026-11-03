@@ -5,11 +5,8 @@
 import apiClient from '../../lib/apiClient';
 import { unwrap } from '../../lib/unwrap';
 
-<<<<<<< HEAD
-=======
 export { apiClient };
 
->>>>>>> 8f997a0 (Fix frontend tracking)
 const BASE = '/admin';
 
 /* ── low-level helpers ── */
@@ -19,11 +16,7 @@ const put    = (url, data, cfg)    => apiClient.put(url, data, cfg).then(unwrap)
 const patch  = (url, data)         => apiClient.patch(url, data).then(unwrap);
 const del    = (url)               => apiClient.delete(url).then(unwrap);
 const mCfg   = (form)             => form instanceof FormData
-<<<<<<< HEAD
-  ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
-=======
   ? { headers: { 'Content-Type': undefined } } : {};
->>>>>>> 8f997a0 (Fix frontend tracking)
 
 /* ═══════════════════════ CATALOG ═══════════════════════ */
 
@@ -80,8 +73,6 @@ export const productApi = {
   togglePublish: (id, isActive) => patch(`${BASE}/products/${id}/publish`, { isActive }),
 };
 
-<<<<<<< HEAD
-=======
 /* ══════════════════════ BOOKINGS ══════════════════════ */
 
 export const bookingApi = {
@@ -93,7 +84,6 @@ export const bookingApi = {
   updateStatus: (id, status) => patch(`${BASE}/bookings/${id}/status`, { status }),
 };
 
->>>>>>> 8f997a0 (Fix frontend tracking)
 /* ══════════════════════ ORDERS (read + status update) ══════════════════════ */
 
 export const orderApi = {
@@ -174,22 +164,6 @@ export const protectionApi = {
 /* ═══════════════════════ CMS PAGES ═══════════════════════ */
 
 export const cmsPageApi = {
-<<<<<<< HEAD
-  // CMS pages use pageKey not _id; we normalise to make useAdminResource work
-  getAll: async (p) => {
-    const raw = await apiClient.get(`${BASE}/cms/pages`, { params: p }).then(unwrap);
-    // raw is an array; normalise to { items } 
-    const list = Array.isArray(raw) ? raw : raw?.items ?? [];
-    return { items: list };
-  },
-  getById: (id) => get(`${BASE}/cms/pages/${id}`),
-  create:  (f) => post(`${BASE}/cms/pages`, f, mCfg(f)),
-  update:  (id, f) => {
-    // CMS pages are updated by pageKey, not _id
-    return put(`${BASE}/cms/pages/${id}`, f, mCfg(f));
-  },
-  remove: (id) => del(`${BASE}/cms/pages/${id}`),
-=======
   // CMS pages use pageKey or _id; normalise to { items, pagination }
   getAll: async (p) => {
     const raw = await apiClient.get(`${BASE}/cms/pages`, { params: p }).then(unwrap);
@@ -200,37 +174,19 @@ export const cmsPageApi = {
   create:  (f) => post(`${BASE}/cms/pages`, f, mCfg(f)),
   update:  (id, f) => put(`${BASE}/cms/pages/${id}`, f, mCfg(f)),
   remove:  (id) => del(`${BASE}/cms/pages/${id}`),
->>>>>>> 8f997a0 (Fix frontend tracking)
 };
 
-/* ═══════════════════════ MEDIA UPLOAD ═══════════════════════ */
+/* ═══════════════════════ USERS (CUSTOMERS & STAFF) ═══════════════════════ */
 
 <<<<<<< HEAD
 export const mediaApi = {
 =======
 export const userApi = {
-  getAll: (p) => get(`${BASE}/users`, p),
-  update: (id, f) => put(`${BASE}/users/${id}`, f),
-};
- {
->>>>>>> 8f997a0 (Fix frontend tracking)
-  uploadSingle: (file, folder = 'misc') => {
-    const fd = new FormData();
-    fd.append('image', file);
-    fd.append('folder', folder);
-    return post(`${BASE}/media/upload`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-  },
-  uploadMultiple: (files, folder = 'misc') => {
-    const fd = new FormData();
-    files.forEach((f) => fd.append('images', f));
-    fd.append('folder', folder);
-    return post(`${BASE}/media/upload-multiple`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-  },
-  // Stub CRUD so useAdminResource can be used in upload-only mode
-  getAll:  () => Promise.resolve({ items: [] }),
-  create:  () => Promise.resolve(null),
-  update:  () => Promise.resolve(null),
-  remove:  () => Promise.resolve(null),
+  getAll:  (p) => get(`${BASE}/users`, p),
+  getById: (id) => get(`${BASE}/users/${id}`),
+  create:  (d) => post(`${BASE}/users`, d),
+  update:  (id, d) => put(`${BASE}/users/${id}`, d),
+  remove:  (id) => del(`${BASE}/users/${id}`),
 };
 
 /* ═══════════════════════ CONVENIENCE FETCHERS ═══════════════════════ */

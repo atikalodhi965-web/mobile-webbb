@@ -21,64 +21,6 @@ const uploadSingle = asyncHandler(async (req, res) => {
   });
 });
 
-const listMedia = asyncHandler(async (req, res) => {
-  const fs = require('fs');
-  const path = require('path');
-  const baseDir = path.join(process.cwd(), 'uploads');
-  const walk = (dir) => {
-    let results = [];
-    const list = fs.readdirSync(dir);
-    list.forEach((file) => {
-      const full = path.join(dir, file);
-      const stat = fs.statSync(full);
-      if (stat && stat.isDirectory()) {
-        results = results.concat(walk(full));
-      } else {
-        const rel = path.relative(baseDir, full).replace(/\\\\/g, '/');
-        results.push({
-          url: `/uploads/${rel}`,
-          name: file,
-          size: stat.size,
-          uploaded: stat.birthtime,
-          folder: path.dirname(rel),
-        });
-      }
-    });
-    return results;
-  };
-  const items = walk(baseDir);
-  sendSuccess(res, { message: 'Media files fetched', data: { items } });
-});
-
-const listMedia = asyncHandler(async (req, res) => {
-  const fs = require('fs');
-  const path = require('path');
-  const baseDir = path.join(process.cwd(), 'uploads');
-  const walk = (dir) => {
-    let results = [];
-    const list = fs.readdirSync(dir);
-    list.forEach((file) => {
-      const full = path.join(dir, file);
-      const stat = fs.statSync(full);
-      if (stat && stat.isDirectory()) {
-        results = results.concat(walk(full));
-      } else {
-        const rel = path.relative(baseDir, full).replace(/\\\\/g, '/');
-        results.push({
-          url: `/uploads/${rel}`,
-          name: file,
-          size: stat.size,
-          uploaded: stat.birthtime,
-          folder: path.dirname(rel),
-        });
-      }
-    });
-    return results;
-  };
-  const items = walk(baseDir);
-  sendSuccess(res, { message: 'Media files fetched', data: { items } });
-});
-
 const uploadMultiple = asyncHandler(async (req, res) => {
   if (!req.files?.length) throw new ApiError(400, 'No image files uploaded.');
 

@@ -1,78 +1,29 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { REFURBISHED_PRODUCTS, getProductById } from './data/refurbishedData';
 import { useCart } from '../../context/CartContext';
+import { useProductDetail } from '../../hooks/useProducts';
+import { getMediaUrl } from '../../services/mediaService';
+import { mapProduct } from '../../utils/productMapper';
 
-// Interactive Front & Back Phone Graphic component with dynamic color theme
-const MainDeviceDisplay = ({ product, selectedColor }) => {
-  const phoneBg = selectedColor?.phoneBg || '#255273';
-  const hex = selectedColor?.hex || '#2D5C7F';
-  const gradient = selectedColor?.screenGradient || 'from-blue-900 via-teal-800 to-indigo-950';
-
+// Display the product's actual gallery image without any device mockup behind it.
+const MainDeviceDisplay = ({ product, imageUrl }) => {
   return (
-    <div className="relative w-full aspect-[4/3.2] max-h-[440px] flex items-center justify-center select-none py-4 px-2">
-      {/* Soft background glow matching phone color */}
-      <div
-        className="absolute inset-4 rounded-3xl opacity-20 blur-2xl transition-colors duration-500"
-        style={{ backgroundColor: hex }}
-      ></div>
-
-      <div className="relative flex items-center justify-center space-x-3 sm:space-x-6 z-10 w-full max-w-md">
-
-        {/* Back of Phone */}
-        <div
-          className="relative w-36 sm:w-44 h-64 sm:h-80 rounded-[36px] p-2 shadow-2xl border-2 border-white/30 transform -rotate-3 transition-all duration-500 shrink-0"
-          style={{ backgroundColor: phoneBg }}
-        >
-          <div className="w-full h-full rounded-[28px] relative overflow-hidden flex flex-col justify-between p-3 border border-black/10">
-            {/* Camera Module */}
-            <div className="w-12 sm:w-14 h-12 sm:h-14 bg-black/20 backdrop-blur-xs rounded-2xl p-1.5 shadow-inner border border-white/10 grid grid-cols-2 gap-1 items-center justify-items-center">
-              <div className="w-4 h-4 rounded-full bg-slate-950 border border-slate-700 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-blue-900/80"></div>
-              </div>
-              <div className="w-4 h-4 rounded-full bg-slate-950 border border-slate-700 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-blue-900/80"></div>
-              </div>
-              <div className="col-span-2 w-1.5 h-1.5 rounded-full bg-amber-200/90 shadow-xs"></div>
-            </div>
-
-            {/* Apple Silhouette */}
-            <div className="self-center my-auto opacity-40 text-white font-black text-lg sm:text-xl select-none">
-              
-            </div>
-
-            {/* Antenna line accent */}
-            <div className="w-full h-0.5 bg-black/10 rounded-full"></div>
-          </div>
+    <div className="relative w-full aspect-[4/3.2] max-h-[440px] rounded-[28px] border border-gray-200 bg-white shadow-sm overflow-hidden flex items-center justify-center p-4 sm:p-6">
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={product?.name || 'Refurbished product'}
+          className="w-full h-full object-contain rounded-2xl"
+        />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center rounded-2xl bg-gray-100 text-gray-500">
+          <span className="text-xs font-semibold uppercase tracking-[0.2em]">No Image</span>
+          <span className="mt-2 text-sm font-medium">{product?.name || 'Product image unavailable'}</span>
         </div>
-
-        {/* Front of Phone */}
-        <div className="relative w-36 sm:w-44 h-64 sm:h-80 bg-slate-950 rounded-[36px] p-2 shadow-2xl border-2 border-slate-800 transform rotate-3 transition-all duration-500 shrink-0 -ml-8 sm:-ml-10 z-10">
-          <div className={`w-full h-full bg-gradient-to-br ${gradient} rounded-[28px] relative overflow-hidden p-2 flex flex-col justify-between border border-white/10`}>
-
-            {/* Dynamic Island / Notch */}
-            <div className="mx-auto w-12 sm:w-14 h-3 bg-slate-950 rounded-full mt-1 flex items-center justify-end px-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-950 border border-blue-800"></div>
-            </div>
-
-            {/* Screen Wallpaper Content */}
-            <div className="my-auto px-2 text-center">
-              <div className="w-full py-3 px-2 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex flex-col items-center justify-center shadow-lg">
-                <span className="text-[10px] sm:text-xs text-white/80 font-mono tracking-wider">SAMZ Certified</span>
-                <span className="text-sm sm:text-base font-extrabold text-white tracking-wide">{product.name}</span>
-                <span className="text-[9px] text-white/70 mt-0.5 font-medium">{selectedColor?.name}</span>
-              </div>
-            </div>
-
-            {/* Home Indicator Bar */}
-            <div className="mx-auto w-14 h-1 bg-white/60 rounded-full mb-1"></div>
-          </div>
-        </div>
-
-      </div>
+      )}
     </div>
   );
 };
@@ -80,25 +31,32 @@ const MainDeviceDisplay = ({ product, selectedColor }) => {
 const RefurbishedProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { product: apiProduct, loading, error } = useProductDetail(id);
+  const product = apiProduct ? mapProduct(apiProduct) : null;
 
-  // Find product by route parameter id
-  const product = getProductById(id);
-
-  // States for options
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
-  const [selectedCapacity, setSelectedCapacity] = useState(product.capacities[0] || '128GB');
-<<<<<<< HEAD
-  const [selectedConditionIndex, setSelectedConditionIndex] = useState(
-    product.conditionPrices.findIndex(c => c.condition === 'Fair+') !== -1
-      ? product.conditionPrices.findIndex(c => c.condition === 'Fair+')
-      : 0
-  );
-=======
-  const [selectedConditionIndex, setSelectedConditionIndex] = useState(() => {
-    const idx = (product?.conditionPrices || []).findIndex(c => c.condition === 'Refurbished');
-    return idx !== -1 ? idx : 0;
-  });
->>>>>>> 8f997a0 (Fix frontend tracking)
+  const [selectedCapacity, setSelectedCapacity] = useState('');
+  const [selectedConditionIndex, setSelectedConditionIndex] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  const galleryImages = (() => {
+    const urls = [];
+    const seen = new Set();
+
+    const addImage = (value) => {
+      if (!value) return;
+      const normalized = getMediaUrl(value, '');
+      if (!normalized || seen.has(normalized)) return;
+      seen.add(normalized);
+      urls.push(normalized);
+    };
+
+    addImage(product?.image);
+    (product?.images || []).forEach(addImage);
+    (product?.colors || []).forEach((color) => addImage(color?.image));
+
+    return urls;
+  })();
 
   // Accordion toggle state
   const [expandedSections, setExpandedSections] = useState({
@@ -129,18 +87,45 @@ const RefurbishedProductDetail = () => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  // Ensure options sync if product changes
   useEffect(() => {
     if (product) {
       setSelectedColorIndex(0);
       setSelectedCapacity(product.capacities[0] || '128GB');
-      const defaultCondIdx = product.conditionPrices.findIndex(c => c.condition === 'Fair+');
+      const defaultCondIdx = product.conditionPrices.findIndex((c) => c.condition === 'Fair+' || c.condition === 'Refurbished');
       setSelectedConditionIndex(defaultCondIdx !== -1 ? defaultCondIdx : 0);
+      setSelectedImageIndex(0);
     }
-  }, [product?.id]);
+  }, [product?.id, product?.slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col font-sans text-[#1C0D2A]">
+        <Header />
+        <main className="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+          <div className="animate-pulse bg-gray-100 rounded-3xl h-[600px]" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col font-sans text-[#1C0D2A]">
+        <Header />
+        <main className="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl p-6 text-center font-medium">
+            {error || 'Product not found.'}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const selectedColor = product.colors[selectedColorIndex] || product.colors[0];
   const selectedCondition = product.conditionPrices[selectedConditionIndex] || product.conditionPrices[0];
+  const selectedGalleryImage = galleryImages[selectedImageIndex] || galleryImages[0] || product.image || '';
 
   const { addToCart } = useCart();
 
@@ -229,34 +214,40 @@ const RefurbishedProductDetail = () => {
           {/* Left Column: Thumbnails + Large Display */}
           <div className="lg:col-span-6 bg-gray-50/50 rounded-2xl p-4 sm:p-6 border border-gray-100 flex flex-col sm:flex-row items-center gap-4">
 
-            {/* 4 Vertical Thumbnails on Left */}
-            <div className="flex sm:flex-col flex-row gap-3 justify-center order-2 sm:order-1">
-              {product.colors.map((c, index) => {
-                const isActive = index === selectedColorIndex;
-                return (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => setSelectedColorIndex(index)}
-                    className={`w-16 sm:w-20 h-20 sm:h-24 rounded-2xl p-1 border-2 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center bg-white shadow-xs ${isActive
-                      ? 'border-[#FF6534] shadow-md scale-105'
-                      : 'border-gray-200 hover:border-gray-400'
+            {/* Image thumbnails on the left */}
+            <div className="flex sm:flex-col flex-row gap-3 justify-center order-2 sm:order-1 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0">
+              {galleryImages.length > 0 ? (
+                galleryImages.map((imageUrl, index) => {
+                  const isActive = index === selectedImageIndex;
+                  return (
+                    <button
+                      key={`${imageUrl}-${index}`}
+                      type="button"
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`w-16 sm:w-20 h-20 sm:h-24 rounded-2xl p-1 border-2 transition-all duration-200 cursor-pointer flex items-center justify-center bg-white shadow-xs ${
+                        isActive
+                          ? 'border-[#FF6534] shadow-md scale-105'
+                          : 'border-gray-200 hover:border-gray-400'
                       }`}
-                  >
-                    {/* Small graphic preview in thumbnail */}
-                    <div className="w-10 sm:w-12 h-14 sm:h-16 rounded-xl flex items-center justify-center p-1" style={{ backgroundColor: c.phoneBg }}>
-                      <div className="w-full h-full bg-slate-900 rounded-lg flex items-center justify-center">
-                        <span className="text-[10px] text-white font-bold select-none">{c.name.slice(0, 3)}</span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={`${product.name} view ${index + 1}`}
+                        className="w-full h-full object-contain rounded-xl"
+                      />
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="w-16 sm:w-20 h-20 sm:h-24 rounded-2xl border border-dashed border-gray-300 bg-white flex items-center justify-center text-[10px] font-semibold text-gray-400">
+                  No image
+                </div>
+              )}
             </div>
 
-            {/* Big Main Frame Display */}
+            {/* Big image display */}
             <div className="w-full order-1 sm:order-2 flex-grow">
-              <MainDeviceDisplay product={product} selectedColor={selectedColor} />
+              <MainDeviceDisplay product={product} imageUrl={selectedGalleryImage} />
             </div>
 
           </div>
