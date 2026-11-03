@@ -14,7 +14,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [config.clientUrl, config.adminUrl, 'http://localhost:5173', 'http://localhost:5174'],
+    origin: [config.clientUrl, config.adminUrl, 'https://mobile-webbb.vercel.app', 'http://localhost:5174'],
     credentials: true,
   })
 );
