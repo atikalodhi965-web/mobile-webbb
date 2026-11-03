@@ -284,26 +284,155 @@ const CheckoutPage = () => {
   const finalTotal = Math.max(0, subtotal - appliedDiscount + shippingFee);
   const estimatedTax = (finalTotal * 0.2 / 1.2).toFixed(2); // UK 20% VAT included
 
-  // Handle Successful Payment from PayPal Modal
-  const handlePaymentSuccess = (paymentDetails) => {
+  // Build order payload matching backend Order and Payment schemas
+  const buildOrderPayload = () => {
+    const formattedItems = displayItems.map((item) => {
+      let itemType = 'other';
+      if (item.isPack) itemType = 'mail_pack';
+      else if (item.itemType) itemType = item.itemType;
+      else if (item.productId) itemType = 'refurbished';
+      else if (item.repairServiceId) itemType = 'repair';
+
+      const colorStr = typeof item.color === 'string'
+        ? item.color
+        : (item.color?.name || item.color?.title || '');
+
+      const conditionStr = typeof item.condition === 'string'
+        ? item.condition
+        : (item.condition?.condition || item.condition?.label || '');
+
+      const validProductId = typeof item.productId === 'string' && /^[a-f\d]{24}$/i.test(item.productId)
+        ? item.productId
+        : null;
+
+      const validRepairServiceId = typeof item.repairServiceId === 'string' && /^[a-f\d]{24}$/i.test(item.repairServiceId)
+        ? item.repairServiceId
+        : null;
+
+      return {
+        itemType,
+        productId: validProductId,
+        repairServiceId: validRepairServiceId,
+        name: item.name || 'Store Item',
+        specs: item.specs || '',
+        color: colorStr,
+        capacity: item.capacity || '',
+        condition: conditionStr,
+        unitPrice: Number(item.unitPrice) || 0,
+        quantity: Number(item.quantity) || 1,
+        image: item.image || null,
+      };
+    });
+
+    const shippingAddress = {
+      address: formData.address,
+      apartment: formData.apartment || '',
+      city: formData.city,
+      postcode: formData.postcode,
+      country: formData.country || 'United Kingdom',
+    };
+
+    const billingAddress = formData.billingAddressType === 'same'
+      ? shippingAddress
+      : {
+          address: formData.differentBillingAddress || formData.address,
+          apartment: '',
+          city: formData.city,
+          postcode: formData.postcode,
+          country: formData.country || 'United Kingdom',
+        };
+
+    return {
+      items: formattedItems,
+      customer: {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        company: formData.company || '',
+        phone: formData.phone || '',
+      },
+      shippingAddress,
+      billingAddress,
+      discountCode: appliedDiscount > 0 ? discountCode : undefined,
+      shippingFee: 0,
+      paymentMethod: formData.paymentMethod || 'paypal',
+      saveInfo: formData.saveInfo,
+      newsOffers: formData.newsOffers,
+    };
+  };
+
+  // Handle Successful Payment from PayPal (or standard order completion)
+  const handlePaymentSuccess = (savedOrder, savedPayment) => {
     setIsPayPalOpen(false);
     clearCart();
 
+    const shippingAddrStr = typeof savedOrder?.shippingAddress === 'string'
+      ? savedOrder.shippingAddress
+      : [
+          savedOrder?.shippingAddress?.address || formData.address,
+          savedOrder?.shippingAddress?.apartment || formData.apartment,
+          savedOrder?.shippingAddress?.city || formData.city,
+          savedOrder?.shippingAddress?.postcode || formData.postcode,
+          savedOrder?.shippingAddress?.country || formData.country || 'United Kingdom',
+        ]
+          .filter(Boolean)
+          .join(', ');
+
     const orderRecord = {
-      orderNumber: 'SMZ-' + Math.floor(100000 + Math.random() * 900000),
+      orderNumber: savedOrder?.orderNumber || 'SMZ-' + Math.floor(100000 + Math.random() * 900000),
       date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
-      customerName: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      phone: formData.phone,
-      shippingAddress: `${formData.address}${formData.apartment ? ', ' + formData.apartment : ''}, ${formData.city}, ${formData.postcode}, ${formData.country}`,
-      paymentMethod: 'PayPal',
-      transactionId: paymentDetails.transactionId,
-      total: finalTotal,
-      items: displayItems
+      customerName: `${savedOrder?.customer?.firstName || formData.firstName} ${savedOrder?.customer?.lastName || formData.lastName}`.trim(),
+      email: savedOrder?.customer?.email || formData.email,
+      phone: savedOrder?.customer?.phone || formData.phone,
+      shippingAddress: shippingAddrStr,
+      paymentMethod: savedOrder?.paymentMethod === 'paypal' || savedPayment ? 'PayPal' : (formData.paymentMethod || 'PayPal'),
+      transactionId: savedPayment?.transactionId || savedPayment?.paypalOrderId || (savedOrder?._id ? `TXN-${savedOrder._id}` : 'TXN-CONFIRMED'),
+      total: Number(savedOrder?.total ?? finalTotal),
+      items: savedOrder?.items && savedOrder.items.length ? savedOrder.items : displayItems,
+      rawOrder: savedOrder,
+      rawPayment: savedPayment,
     };
 
     setCompletedOrder(orderRecord);
     setCheckoutStep('success');
+  };
+
+  // Place non-PayPal order (e.g. Klarna)
+  const handlePlaceNonPayPalOrder = async () => {
+    if (!validateForm()) {
+      setCheckoutStep('details');
+      window.scrollTo({ top: 120, behavior: 'smooth' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const payload = buildOrderPayload();
+      const res = await placeOrder(payload);
+      const savedOrder = res?.order || res;
+      const savedPayment = res?.payment;
+      handlePaymentSuccess(savedOrder, savedPayment);
+    } catch (err) {
+      console.error('Failed to place order:', err);
+      alert(err?.response?.data?.message || err?.message || 'Failed to place order');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle Pay Now button click
+  const handlePayNow = () => {
+    if (!validateForm()) {
+      setCheckoutStep('details');
+      window.scrollTo({ top: 120, behavior: 'smooth' });
+      return;
+    }
+
+    if (formData.paymentMethod === 'paypal') {
+      setIsPayPalOpen(true);
+    } else {
+      handlePlaceNonPayPalOrder();
+    }
   };
 
   // ==========================================
@@ -437,9 +566,10 @@ const CheckoutPage = () => {
                   type="button"
                   onClick={() => {
                     if (validateForm()) {
+                      handleInputChange('paymentMethod', 'paypal');
                       setIsPayPalOpen(true);
                     } else {
-                      setIsPayPalOpen(true); // Allow direct express PayPal launch
+                      window.scrollTo({ top: 120, behavior: 'smooth' });
                     }
                   }}
                   className="w-full bg-[#FFC439] hover:bg-[#F2BA36] py-3 px-6 rounded-lg shadow-xs flex items-center justify-center transition-all cursor-pointer"
@@ -703,8 +833,24 @@ const CheckoutPage = () => {
                     </div>
 
                     {formData.paymentMethod === 'paypal' && (
-                      <div className="mt-3 pt-3 border-t border-gray-200 text-center text-xs text-gray-600 bg-gray-50/70 p-3 rounded-lg">
-                        You'll be redirected to PayPal to complete your purchase
+                      <div className="mt-3 pt-3 border-t border-gray-200 text-center text-xs text-gray-600 bg-gray-50/70 p-3 rounded-lg space-y-2">
+                        <p>You'll be connected securely to PayPal to approve your payment.</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (validateForm()) {
+                              setIsPayPalOpen(true);
+                            } else {
+                              setCheckoutStep('details');
+                              window.scrollTo({ top: 120, behavior: 'smooth' });
+                            }
+                          }}
+                          className="inline-flex items-center justify-center gap-1.5 bg-[#FFC439] hover:bg-[#F2BA36] text-[#003087] font-black text-xs px-4 py-2 rounded-lg transition-all shadow-2xs cursor-pointer"
+                        >
+                          <span>Open</span>
+                          <span className="italic tracking-tighter">Pay<span className="text-[#0079C1]">Pal</span></span>
+                          <span>Checkout</span>
+                        </button>
                       </div>
                     )}
                   </div>
@@ -911,11 +1057,12 @@ const CheckoutPage = () => {
                 <button
                   type="button"
                   id="checkout-pay-now-btn"
-                  onClick={() => setIsPayPalOpen(true)}
-                  className="w-full bg-[#1773B0] hover:bg-[#146296] text-white font-bold py-4 px-6 rounded-lg shadow-sm transition-all text-base cursor-pointer active:scale-[0.99] flex items-center justify-center gap-2"
+                  onClick={handlePayNow}
+                  disabled={isSubmitting}
+                  className="w-full bg-[#1773B0] hover:bg-[#146296] text-white font-bold py-4 px-6 rounded-lg shadow-sm transition-all text-base cursor-pointer active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <Lock className="w-4 h-4 text-white/80" />
-                  <span>Pay now</span>
+                  <span>{isSubmitting ? 'Processing Order...' : 'Pay now'}</span>
                 </button>
               </div>
 
@@ -1056,16 +1203,17 @@ const CheckoutPage = () => {
 
       </div>
 
-      {/* PAYPAL INTEGRATION MODAL (IMAGE 4) */}
+      {/* PAYPAL INTEGRATION MODAL */}
       <PayPalModal
         isOpen={isPayPalOpen}
         onClose={() => setIsPayPalOpen(false)}
         onPaymentSuccess={handlePaymentSuccess}
+        orderPayload={buildOrderPayload()}
         orderDetails={{
           total: finalTotal,
           email: formData.email,
-          customerName: `${formData.firstName} ${formData.lastName}`,
-          shippingAddress: `${formData.address}, ${formData.city}`
+          customerName: `${formData.firstName} ${formData.lastName}`.trim(),
+          shippingAddress: `${formData.address}${formData.apartment ? ', ' + formData.apartment : ''}, ${formData.city}, ${formData.postcode}`,
         }}
       />
     </div>

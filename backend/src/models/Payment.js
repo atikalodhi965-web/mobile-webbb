@@ -13,6 +13,7 @@ const paymentSchema = new mongoose.Schema(
       enum: ['paypal', 'klarna', 'card', 'other'],
       required: true,
     },
+    paypalOrderId: { type: String, default: '', index: true },
     transactionId: { type: String, default: '' },
     amount: { type: Number, required: true },
     currency: { type: String, default: 'GBP' },

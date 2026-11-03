@@ -15,6 +15,18 @@ const config = {
     email: process.env.ADMIN_EMAIL || 'admin@samz.com',
     password: process.env.ADMIN_PASSWORD || 'Admin@12345',
   },
+  paypal: {
+    clientId: process.env.PAYPAL_CLIENT_ID || '',
+    clientSecret: process.env.PAYPAL_CLIENT_SECRET || '',
+    mode: process.env.PAYPAL_MODE || 'sandbox',
+    currency: process.env.PAYPAL_CURRENCY || 'GBP',
+    get baseUrl() {
+      const mode = (this.mode || '').toLowerCase();
+      return mode === 'live' || mode === 'production'
+        ? 'https://api-m.paypal.com'
+        : 'https://api-m.sandbox.paypal.com';
+    },
+  },
 };
 
 module.exports = config;
