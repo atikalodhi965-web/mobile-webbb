@@ -38,7 +38,12 @@ app.get('/api/v1/health', (req, res) => {
 
 app.use('/api/v1', publicRoutes);
 app.use('/api/v1/admin', adminRoutes);
-
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Backend is running successfully!"
+  });
+});
 app.use(notFound);
 app.use(errorHandler);
 
