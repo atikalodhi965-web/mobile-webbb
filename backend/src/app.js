@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -27,7 +28,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Serve uploaded images
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+const uploadsDir = fs.existsSync(path.resolve(__dirname, '../uploads'))
+  ? path.resolve(__dirname, '../uploads')
+  : path.resolve(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadsDir));
 
 // Root route - ping to check if service is up
 app.get('/', (req, res) => {

@@ -4,15 +4,17 @@ import { getMediaUrl } from '../../../services/mediaService';
 
 const DeviceGraphic = ({ image, name }) => {
   const productImage = getMediaUrl(image, '');
+  const [imgError, setImgError] = React.useState(false);
 
   return (
     <div className="relative w-full h-56 flex items-center justify-center my-2 select-none group">
       <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-gray-100/50 rounded-2xl -z-10 group-hover:scale-102 transition-transform duration-300"></div>
 
       <div className="relative flex items-center justify-center w-full h-full">
-        {productImage ? (
+        {productImage && !imgError ? (
           <img
             src={productImage}
+            onError={() => setImgError(true)}
             alt={name}
             className="max-h-full max-w-full object-contain drop-shadow-xl rounded-2xl"
           />

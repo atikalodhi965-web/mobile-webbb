@@ -12,7 +12,10 @@ const ensureDir = (dir) => {
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const folder = req.uploadFolder || 'misc';
-    const dest = path.join(process.cwd(), 'uploads', folder);
+    const uploadsBase = fs.existsSync(path.resolve(__dirname, '../../uploads'))
+      ? path.resolve(__dirname, '../../uploads')
+      : path.resolve(process.cwd(), 'uploads');
+    const dest = path.join(uploadsBase, folder);
     ensureDir(dest);
     cb(null, dest);
   },

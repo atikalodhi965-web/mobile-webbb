@@ -10,11 +10,14 @@ import { mapProduct } from '../../utils/productMapper';
 
 // Display the product's actual gallery image without any device mockup behind it.
 const MainDeviceDisplay = ({ product, imageUrl }) => {
+  const [hasError, setHasError] = useState(false);
+  useEffect(() => { setHasError(false); }, [imageUrl]);
   return (
     <div className="relative w-full aspect-[4/3.2] max-h-[440px] rounded-[28px] border border-gray-200 bg-white shadow-sm overflow-hidden flex items-center justify-center p-4 sm:p-6">
-      {imageUrl ? (
+      {imageUrl && !hasError ? (
         <img
           src={imageUrl}
+          onError={() => setHasError(true)}
           alt={product?.name || 'Refurbished product'}
           className="w-full h-full object-contain rounded-2xl"
         />

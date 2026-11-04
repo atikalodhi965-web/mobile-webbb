@@ -120,6 +120,7 @@ const SelectDeviceType = () => {
                   <img
                     src={device.image}
                     alt={device.title}
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = localImageFor(device.slug || device.title); }}
                     className="max-h-[170px] max-w-[85%] object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>

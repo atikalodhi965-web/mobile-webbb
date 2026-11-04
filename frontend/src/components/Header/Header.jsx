@@ -44,7 +44,7 @@ const Header = () => {
 
           {/* Logo Section */}
           <div className="flex-shrink-0 flex items-center gap-3">
-            <a href="/" className="flex items-center gap-2.5 group">
+            <Link to="/" className="flex items-center gap-2.5 group">
               {/* SAMZ Stylized Diamond X Icon */}
               <div className="relative w-8 h-8 flex items-center justify-center">
                 <div className="grid grid-cols-2 gap-1 transform rotate-45 group-hover:scale-105 transition-transform duration-200">
@@ -57,7 +57,7 @@ const Header = () => {
               <span className="text-3xl font-extrabold tracking-tight text-[#282338]">
                 SAMZ
               </span>
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Navigation Links */}
@@ -73,13 +73,13 @@ const Header = () => {
                     }}
                     onMouseLeave={() => setIsRepairsHovered(false)}
                   >
-                    <a
-                      href={link.href}
+                    <Link
+                      to={link.href}
                       className={`px-3 py-2 transition-colors duration-150 tracking-tight whitespace-nowrap ${isRepairsHovered ? 'text-[#FF6534]' : 'text-[#282338] hover:text-[#FF6534]'
                         }`}
                     >
                       {link.title}
-                    </a>
+                    </Link>
                   </div>
                 ) : link.title === 'About Us' ? (
                   <div
@@ -108,12 +108,12 @@ const Header = () => {
                     )}
                   </div>
                 ) : (
-                  <a
-                    href={link.href}
+                  <Link
+                    to={link.href}
                     className="text-[#282338] hover:text-[#FF6534] px-3 py-2 transition-colors duration-150 tracking-tight whitespace-nowrap"
                   >
                     {link.title}
-                  </a>
+                  </Link>
                 )}
                 {index < navLinks.length - 1 && (
                   <span className="text-[#f2a1b7] font-light select-none px-1">|</span>

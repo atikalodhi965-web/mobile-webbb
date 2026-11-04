@@ -178,9 +178,6 @@ export const cmsPageApi = {
 
 /* ═══════════════════════ USERS (CUSTOMERS & STAFF) ═══════════════════════ */
 
-// <<<<<<< HEAD
-// export const mediaApi = {
-// =======
 export const userApi = {
   getAll:  (p) => get(`${BASE}/users`, p),
   getById: (id) => get(`${BASE}/users/${id}`),

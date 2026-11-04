@@ -68,6 +68,7 @@ const MobileRepairs = () => {
               <div className="relative z-10 w-32 sm:w-36 h-44 sm:h-48 flex items-center justify-center group-hover:-translate-y-2 transition-transform duration-300">
                 <img
                   src={getMediaUrl(brand.image, brandFallbackImage(brand))}
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = brandFallbackImage(brand); }}
                   alt={`${brand.name} Repair`}
                   className="max-h-full max-w-full object-contain drop-shadow-lg"
                 />
