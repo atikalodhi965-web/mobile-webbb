@@ -3,7 +3,7 @@ require('dotenv').config();
 const config = {
   port: process.env.PORT || 5000,
   nodeEnv: process.env.NODE_ENV || 'development',
-  mongoUri: process.env.MONGODB_URI,
+  mongoUri: process.env.MONGODB_URI || process.env.MONGO_URI,
   jwt: {
     secret: process.env.JWT_SECRET || 'samz_fallback_secret',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
